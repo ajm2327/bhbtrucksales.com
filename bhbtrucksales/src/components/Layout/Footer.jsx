@@ -44,7 +44,7 @@ const Footer = () => {
                     {/*Contact info */}
                     <div>
                         <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-                        <div className="space-7-2 text-gray-300">
+                        <div className="space-y-2 text-gray-300">
                             <p>Phone: (520) 889-2323</p>
                             <p>Address: 5158 S Nogales Hwy,<br />
                                 Tucson, AZ 85706</p>

@@ -21,7 +21,7 @@ const Header = () => {
                 <div className="flex justify-between items-center py-4">
                     {/*Logo*/}
                     <Link to="/" className="flex items-center">
-                        <h1 className="text-2xl front-bold text-blue-900">
+                        <h1 className="text-2xl font-bold text-blue-900">
                             BHB Truck Sales
                         </h1>
                     </Link>
@@ -33,8 +33,8 @@ const Header = () => {
                                 key={link.path}
                                 to={link.path}
                                 className={`text-lg font-medium transition-colors duration-200 ${isActive(link.path)
-                                        ? 'text-blue-600 border-b-2 border-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
+                                    ? 'text-blue-600 border-b-2 border-blue-600'
+                                    : 'text-gray-700 hover:text-blue-600'
                                     }`}
                             >
                                 {link.label}
@@ -55,7 +55,7 @@ const Header = () => {
                         >
                             {isMenuOpen ? (
                                 <path
-                                    strokLinecap="round"
+                                    strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
                                     d="M6 18L18 6M6 6l12 12"
@@ -80,8 +80,8 @@ const Header = () => {
                                 key={link.path}
                                 to={link.path}
                                 className={`block py-2 text-lg font-medium ${isActive(link.path)
-                                        ? 'text-blue-600'
-                                        : 'text-gray-700'
+                                    ? 'text-blue-600'
+                                    : 'text-gray-700'
                                     }`}
                                 onClick={() => setIsMenuOpen(false)}
                             >

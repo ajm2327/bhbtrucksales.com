@@ -49,10 +49,10 @@ const TruckCard = ({ truck, isFeatured = false }) => {
                 {/* Condition badge */}
                 <div className="absolute top-4 right-4">
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${truck.condition === 'New'
-                            ? 'bg-green-100 text-green-800'
-                            : truck.condition === 'Used'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-blue-100 text-blue-800'
+                        ? 'bg-green-100 text-green-800'
+                        : truck.condition === 'Used'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-blue-100 text-blue-800'
                         }`}>
                         {truck.condition}
                     </span>
@@ -60,7 +60,7 @@ const TruckCard = ({ truck, isFeatured = false }) => {
             </div>
 
             {/* Card Content */}
-            <div classname="p-6">
+            <div className="p-6">
                 {/* Title and price */}
                 <div className="mb-4">
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
@@ -106,7 +106,7 @@ const TruckCard = ({ truck, isFeatured = false }) => {
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                     <Link
-                        to={`/truck/$/{generateTruckSlug(truck)}`}
+                        to={`/truck/${generateTruckSlug(truck)}`}
                         className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
                         View Details

@@ -1,4 +1,4 @@
-import { usestate, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import TruckCard from '../components/TruckCard/TruckCard'
 import { sampleTrucks } from '../data/trucks'
