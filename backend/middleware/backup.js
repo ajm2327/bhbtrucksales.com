@@ -31,7 +31,7 @@ const auditLog = (req, res, next) => {
     const operation = `${req.method} ${req.originalUrl}`;
     const userAgent = req.get('User-Agent') || 'Unknown';
 
-    console.log(`[${timestmap}] Data Operation: ${operation} - User-Agent: ${userAgent}`);
+    console.log(`[${timestamp}] Data Operation: ${operation} - User-Agent: ${userAgent}`);
 
     res.locals.auditInfo = {
         timestamp,

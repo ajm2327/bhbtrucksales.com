@@ -64,7 +64,7 @@ class FileManager {
             // write file atomically (write to temp file, then rename)
             const tempPath = `${filePath}.tmp`;
             await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf8');
-            await fs.move(tempPath, filePath);
+            await fs.move(tempPath, filePath, { overwrite: true });
 
             console.log(`Successfully wrote ${filename}`);
             return true;
@@ -133,6 +133,15 @@ class FileManager {
     }
 
     /**
+     * get trucks data
+     * @rerturns {object} truck data
+     */
+    async getTrucks() {
+        return await this.readJSON('trucks.json');
+    }
+
+
+    /**
      * Save trucks data
      * @param {Object}
      * @returns {boolean}
@@ -148,7 +157,7 @@ class FileManager {
      * @returns {Object|null}
      */
 
-    async getTruckByID(truckId) {
+    async getTruckById(truckId) {
         try {
             const trucksData = await this.getTrucks();
             return trucksData.trucks.find(truck => truck.id === truckId) || null;

@@ -46,7 +46,7 @@ router.get('/', auditLog, async (req, res) => {
     try {
         const trucksData = await fileManager.getTrucks();
 
-        const activeTrucks = trucksData.trucks.filter(truck => truckisActive);
+        const activeTrucks = trucksData.trucks.filter(truck => truck.isActive);
 
         let filteredTrucks = activeTrucks;
 
@@ -202,7 +202,7 @@ router.put('/:id',
                 }
             }
 
-            trucks.Data.trucks[truckIndex] = updatedTruck;
+            trucksData.trucks[truckIndex] = updatedTruck;
 
             //save to file
             await fileManager.saveTrucks(trucksData);
@@ -276,17 +276,17 @@ router.patch('/:id/toggle',
 
             //toggle boolean field
             trucksData.trucks[truckIndex][fieldName] = !trucksData.trucks[truckIndex][fieldName];
-            trucksData.trucks[truckindex].lastModified = new Date().toISOString();
+            trucksData.trucks[truckIndex].lastModified = new Date().toISOString();
 
             // save to file
 
-            await fileManager.saveTrucks(trucksData)
+            await fileManager.saveTrucks(trucksData);
 
             successResponse(res, {
                 id: req.params.id,
                 field: fieldName,
                 newValue: trucksData.trucks[truckIndex][fieldName]
-            }, `Truck $field} status toggled successfully`);
+            }, `Truck ${field} status toggled successfully`);
         } catch (error) {
             console.error('Error toggling truck status:', error);
             errorResponse(res, 500, 'Failed to toggle truck status', 'TOGGLE_ERROR');
