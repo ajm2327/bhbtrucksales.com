@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -8,6 +9,7 @@ const { dataOperationErrorHandler } = require('./middleware/backup');
 
 //import routes
 const truckRoutes = require('./routes/trucks');
+const authRoutes = require('./routes/auth');
 
 //initialize express app
 const app = express();
@@ -25,7 +27,7 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             imgSrc: ["'self'", "data:", "https:"],
             styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: []
         }
@@ -48,6 +50,19 @@ if (isDevelopment) {
     app.use(morgan('combined'));
 }
 
+// session middleware for authentication
+const session = require('express-session');
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: !isDevelopment,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
 // body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -65,6 +80,9 @@ app.get('/api/health', (req, res) => {
         version: require('./package.json').version
     });
 });
+
+app.use('/api/auth', authRoutes);
+app.use('/', authRoutes)
 
 //API routes
 app.use('/api/trucks', truckRoutes);
@@ -137,6 +155,15 @@ process.on('SIGINT', () => {
 //initialize server
 const startServer = async () => {
     try {
+
+        //cehck required vars
+        if (!process.env.SESSION_SECRET) {
+            throw new Error('SESSION_SECRET environment variable is required');
+
+        }
+        if (!process.env.ADMIN_PASSWORD) {
+            throw new Error('ADMIN_PASSWORD environment variable is required');
+        }
         // ensure data directories exist
         await fileManager.ensureDirectories();
 
