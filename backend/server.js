@@ -4,12 +4,15 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
+const multer = require('multer');
 const fileManager = require('./utils/filemanager');
 const { dataOperationErrorHandler } = require('./middleware/backup');
 
 //import routes
 const truckRoutes = require('./routes/trucks');
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
+const uploadRoutes = require('./routes/uploads');
 
 //initialize express app
 const app = express();
@@ -28,6 +31,7 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "https:"],
             styleSrc: ["'self'", "'unsafe-inline'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrcAttr: ["'unsafe-inline'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: []
         }
@@ -37,7 +41,7 @@ app.use(helmet({
 // CORS config
 const corsOptions = {
     origin: isDevelopment
-        ? ['https://localhost:5173', 'http://localhost:3000']
+        ? ['http://localhost:5173', 'http://localhost:3000']
         : process.env.CORS_ORIGIN?.split(',') || ['https://bhbtrucksales.com'],
     credentials: true,
     optionsSuccessStatus: 200
@@ -81,10 +85,11 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Routes
 app.use('/api/auth', authRoutes);
-app.use('/', authRoutes)
-
-//API routes
+app.use('/', authRoutes); // for login page
+app.use('/admin', adminRoutes);
+app.use('/api/uploads', uploadRoutes);
 app.use('/api/trucks', truckRoutes);
 
 //API documentation endpoint
@@ -129,13 +134,12 @@ app.use('/api/*', (req, res) => {
 app.use(dataOperationErrorHandler);
 
 // generic error handler
-
 app.use((error, req, res, next) => {
     console.error('Unhandled error:', error);
 
     res.status(500).json({
         success: false,
-        error: isDevelopment ? error.message : 'Interval server error',
+        error: isDevelopment ? error.message : 'Internal server error',
         code: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString()
     });
@@ -190,7 +194,9 @@ const startServer = async () => {
             console.log(`📍 Server running on port ${PORT}`);
             console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-            console.log(`📋 API Documentation: http://localhost:${PORT}/api`);
+            //console.log(`📋 API Documentation: http://localhost:${PORT}/api`);
+            console.log(`📋 Admin Dashboard: http://localhost:${PORT}/admin`);
+            console.log(`🔐 Admin Login: http://localhost:${PORT}/admin/login`);
             console.log(`❤️  Health Check: http://localhost:${PORT}/api/health`);
             console.log(`🚚 Trucks Endpoint: http://localhost:${PORT}/api/trucks`);
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

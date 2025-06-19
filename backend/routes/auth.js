@@ -1,10 +1,10 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authLog, checkAuth } = require('../middleware/auth');
+const { authLog, checkAuth, requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
 // Admin password from environment variable
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Validation rules for login
 const loginValidation = () => {
@@ -39,7 +39,7 @@ router.post('/login', loginValidation(), async (req, res) => {
             req.session.loginTime = new Date().toISOString();
 
             console.log('Login successful - session set', {
-                sessionId: req.sesssionID,
+                sessionId: req.sessionID,
                 authenticated: req.session.authenticated,
                 loginTime: req.session.loginTime
             });
@@ -136,7 +136,7 @@ router.get('/admin/login', checkAuth, (req, res) => {
         <style>
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: #f5f5f5;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 margin: 0;
                 padding: 0;
                 display: flex;
@@ -147,8 +147,8 @@ router.get('/admin/login', checkAuth, (req, res) => {
             .login-container {
                 background: white;
                 padding: 2rem;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
                 width: 100%;
                 max-width: 400px;
             }
@@ -156,55 +156,76 @@ router.get('/admin/login', checkAuth, (req, res) => {
                 text-align: center;
                 color: #1e40af;
                 margin-bottom: 2rem;
+                font-size: 1.8rem;
             }
             .form-group {
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }
             label {
                 display: block;
                 margin-bottom: 0.5rem;
-                font-weight: 500;
+                font-weight: 600;
                 color: #374151;
             }
             input[type="password"] {
                 width: 100%;
-                padding: 0.75rem;
-                border: 2px solid #d1d5db;
-                border-radius: 6px;
+                padding: 0.875rem;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
                 font-size: 1rem;
                 box-sizing: border-box;
+                transition: border-color 0.3s ease;
             }
             input[type="password"]:focus {
                 outline: none;
                 border-color: #1e40af;
+                box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
             }
             .login-btn {
                 width: 100%;
-                background: #1e40af;
+                background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
                 color: white;
-                padding: 0.75rem;
+                padding: 0.875rem;
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
                 font-size: 1rem;
+                font-weight: 600;
                 cursor: pointer;
                 margin-top: 1rem;
+                transition: transform 0.2s ease;
             }
-            .login-btn:hover {
-                background: #1d4ed8;
+            .login-btn:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
             }
             .login-btn:disabled {
                 background: #9ca3af;
                 cursor: not-allowed;
+                transform: none;
             }
             .error {
                 color: #dc2626;
                 margin-top: 0.5rem;
                 font-size: 0.875rem;
+                background: #fee2e2;
+                padding: 0.5rem;
+                border-radius: 6px;
+                border: 1px solid #fecaca;
             }
             .loading {
                 text-align: center;
                 color: #6b7280;
                 margin-top: 1rem;
+                font-size: 0.875rem;
+            }
+            .info {
+                background: #eff6ff;
+                color: #1e40af;
+                padding: 1rem;
+                border-radius: 8px;
+                margin-bottom: 1.5rem;
+                font-size: 0.875rem;
+                border: 1px solid #dbeafe;
             }
         </style>
     </head>
@@ -214,7 +235,7 @@ router.get('/admin/login', checkAuth, (req, res) => {
             <form id="loginForm">
                 <div class="form-group">
                     <label for="password">Admin Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="login-btn" id="loginBtn">Login</button>
                 <div id="error" class="error" style="display: none;"></div>
@@ -223,6 +244,9 @@ router.get('/admin/login', checkAuth, (req, res) => {
         </div>
 
         <script>
+            // Focus on password input
+            document.getElementById('password').focus();
+
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
@@ -233,6 +257,7 @@ router.get('/admin/login', checkAuth, (req, res) => {
                 
                 // Show loading state
                 loginBtn.disabled = true;
+                loginBtn.textContent = 'Logging in...';
                 errorDiv.style.display = 'none';
                 loadingDiv.style.display = 'block';
                 
@@ -242,12 +267,14 @@ router.get('/admin/login', checkAuth, (req, res) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
+                        credentials: 'include',
                         body: JSON.stringify({ password })
                     });
                     
                     const data = await response.json();
                     
                     if (data.success) {
+                        loadingDiv.textContent = 'Success! Redirecting...';
                         // Redirect to admin dashboard
                         window.location.href = '/admin';
                     } else {
@@ -255,11 +282,20 @@ router.get('/admin/login', checkAuth, (req, res) => {
                         errorDiv.style.display = 'block';
                     }
                 } catch (error) {
+                    console.error('Login error:', error);
                     errorDiv.textContent = 'Connection error. Please try again.';
                     errorDiv.style.display = 'block';
                 } finally {
                     loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
                     loadingDiv.style.display = 'none';
+                }
+            });
+
+            // Enter key submission
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
                 }
             });
         </script>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fileManager = require('../utils/filemanager');
+const { requireAuth } = require('../middleware/auth');
 const {
     truckValidationRules,
     truckUpdateValidationRules,
@@ -35,11 +36,7 @@ const errorResponse = (res, statusCode, error, code = 'ERROR') => {
         code,
         timestamp: new Date().toISOString()
     });
-
 }
-
-
-// THESE ARE THE API ENDPOINTS FOR TRUCKS CONTENT MANAGEMENT
 
 // GET /api/trucks - get all trucks (public)
 router.get('/', auditLog, async (req, res) => {
@@ -109,10 +106,9 @@ router.get('/:id', truckIdValidation(), handleValidationErrors, auditLog, async 
     }
 });
 
-
-
-// POST /api/trucks - create new truck
+// POST /api/trucks - create new truck (ADMIN ONLY)
 router.post('/',
+    requireAuth,
     autoBackup('trucks.json'),
     auditLog,
     truckValidationRules(),
@@ -156,9 +152,9 @@ router.post('/',
     }
 );
 
-// PUT /api/trucks/:id - update truck (admin only)
-
+// PUT /api/trucks/:id - update truck (ADMIN ONLY)
 router.put('/:id',
+    requireAuth,
     autoBackup('trucks.json'),
     auditLog,
     truckIdValidation(),
@@ -215,8 +211,9 @@ router.put('/:id',
     }
 );
 
-//DELETE /api/trucks/:id - Delete truck
+//DELETE /api/trucks/:id - Delete truck (ADMIN ONLY)
 router.delete('/:id',
+    requireAuth,
     autoBackup('trucks.json'),
     auditLog,
     truckIdValidation(),
@@ -236,7 +233,7 @@ router.delete('/:id',
             // save file
             await fileManager.saveTrucks(trucksData);
 
-            successResponse(res, { deletedTruck }, 'Truk deleted successfully');
+            successResponse(res, { deletedTruck }, 'Truck deleted successfully');
         } catch (error) {
             console.error('Error deleting truck:', error);
             errorResponse(res, 500, 'Failed to delete truck', 'DELETE_ERROR');
@@ -244,16 +241,16 @@ router.delete('/:id',
     }
 );
 
-// PATCH /api/trucks/:id/toggle = toggle truck availability or featured status
-
+// PATCH /api/trucks/:id/toggle = toggle truck availability or featured status (ADMIN ONLY)
 router.patch('/:id/toggle',
+    requireAuth,
     autoBackup('trucks.json'),
     auditLog,
     truckIdValidation(),
     handleValidationErrors,
     async (req, res) => {
         try {
-            const { field } = req.body; //avaialble featured or active
+            const { field } = req.body; //available, featured or active
 
             if (!['available', 'featured', 'active'].includes(field)) {
                 return errorResponse(res, 400, 'Invalid field. Must be available, featured, or active', 'INVALID_FIELD');
@@ -279,7 +276,6 @@ router.patch('/:id/toggle',
             trucksData.trucks[truckIndex].lastModified = new Date().toISOString();
 
             // save to file
-
             await fileManager.saveTrucks(trucksData);
 
             successResponse(res, {

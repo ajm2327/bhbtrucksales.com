@@ -6,9 +6,10 @@ class FileManager {
         this.dataDir = path.join(__dirname, '../data');
         this.backupDir = path.join(this.dataDir, 'backups');
         this.uploadsDir = path.join(__dirname, '../uploads');
+        this.trucksUploadsDir = path.join(this.uploadsDir, 'trucks');
+        this.generalUploadsDir = path.join(this.uploadsDir, 'general')
 
-        this.ensureDirectories();
-
+        //this.ensureDirectories();
     }
 
     async ensureDirectories() {
@@ -16,8 +17,10 @@ class FileManager {
             await fs.ensureDir(this.dataDir);
             await fs.ensureDir(this.backupDir);
             await fs.ensureDir(this.uploadsDir);
-            await fs.ensureDir(path.join(this.uploadsDir, 'trucks'));
-            await fs.ensureDir(path.join(this.uploadsDir, 'general'));
+            await fs.ensureDir(path.join(this.trucksUploadsDir));
+            await fs.ensureDir(path.join(this.generalUploadsDir, 'general'));
+
+            console.log('All required directories ensured');
         } catch (error) {
             console.error('Error creating directories:', error);
         }
@@ -46,8 +49,8 @@ class FileManager {
 
     /**
      * * Write json file safely with backup
-     * @param {string}
-     * @param {Object}
+     * @param {string} filename
+     * @param {Object} data
      * @returns {boolean}
      */
     async writeJSON(filename, data) {
@@ -56,7 +59,9 @@ class FileManager {
             const filePath = path.join(this.dataDir, filename);
 
             // create backup before writing
-            await this.createBackup(filename);
+            if (await fs.pathExists(filePath)) {
+                await this.createBackup(filename);
+            }
 
             // add timestamp to data
             data.lastUpdated = new Date().toISOString();
@@ -91,9 +96,6 @@ class FileManager {
                 await fs.copy(filePath, backupPath);
                 console.log(`Create backup: ${backupName}`);
 
-                await fs.copy(filePath, backupPath);
-                console.log(`Created backup: ${backupName}`);
-
                 //clean old backups, keep 10
                 await this.cleanOldBackups(filename);
             }
@@ -104,7 +106,7 @@ class FileManager {
 
     /**
      * Clean old backup files (keep last 10)
-     * @param {string}
+     * @param {string} filename
      */
 
     async cleanOldBackups(filename) {
@@ -134,7 +136,7 @@ class FileManager {
 
     /**
      * get trucks data
-     * @rerturns {object} truck data
+     * @returns {object} truck data
      */
     async getTrucks() {
         return await this.readJSON('trucks.json');
@@ -143,7 +145,7 @@ class FileManager {
 
     /**
      * Save trucks data
-     * @param {Object}
+     * @param {Object} trucksData
      * @returns {boolean}
      */
 
@@ -153,7 +155,7 @@ class FileManager {
 
     /**
      * Get single truck by ID
-     * @param {string}
+     * @param {string} truckId
      * @returns {Object|null}
      */
 
@@ -169,13 +171,50 @@ class FileManager {
     }
 
     /**
-     * @param {string}
+     * Check if file exists
+     * @param {string} filename
      * @returns {boolean}
      */
 
     async fileExists(filename) {
         const filePath = path.join(this.dataDir, filename);
         return await fs.pathExists(filePath);
+    }
+
+    /**
+     * Create truck upload directrory
+     * @param {string} truckId
+     * @returns {string} directory path
+     */
+    async createTruckUploadDir(truckId) {
+        const truckDir = path.join(this.truckUploadsDir, truckId);
+        await fs.ensureDir(truckDir);
+        return truckDir;
+    }
+
+    /** 
+     * delete truck upload directory and all images
+     * @param {string}
+     * 
+     */
+    async deleteTruckUploadDir(truckId) {
+        const truckDir = path.join(this.trucksUploadsDir, truckId);
+        if (await fs.pathExists(truckDir)) {
+            await fs.remove(truckDir);
+            console.log(`Deleted truck upload directory: ${truckId}`);
+        }
+    }
+
+    /** 
+     * Get upload directory paths
+     * @returns {Object} directory paths
+     */
+    getUploadPaths() {
+        return {
+            uploads: this.uploadsDir,
+            trucks: this.trucksUploadsDir,
+            general: this.generalUploadsDir
+        };
     }
 }
 
