@@ -30,7 +30,7 @@ const TruckCard = ({ truck, isFeatured = false }) => {
             <div className="relative h-48 bg-gray-200">
                 {primaryImage ? (
                     <img
-                        src={primaryImage.url}
+                        src={`http://localhost:3001${primaryImage.url}`}
                         alt={`${truck.year} ${truck.make} ${truck.model}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
