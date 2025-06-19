@@ -3,7 +3,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs-extra');
 const { requireAuth } = require('../middleware/auth');
-const { fileExists } = require('../utils/filemanager');
 const router = express.Router();
 
 // configure multer for image uploads
@@ -22,22 +21,22 @@ const storage = multer.diskStorage({
         }
     },
     filename: (req, file, cb) => {
-        //generate unique filname
+        //generate unique filename
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = path.extname(file.originalname);
-        cb(null, uploadPath);
+        cb(null, `truck-image-${uniqueSuffix}${ext}`);
     }
 });
 
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 10 * 1024 * 1024,
+        fileSize: 10 * 1024 * 1024, // 10MB
         files: 10
     },
     fileFilter: (req, file, cb) => {
         //check file type
-        const allowedTypes = /jpeg|jpg|png|gif|webp/
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
 
@@ -46,7 +45,6 @@ const upload = multer({
         } else {
             cb(new Error('Only image files (jpeg, jpg, png, gif, webp) are allowed'));
         }
-
     }
 });
 
@@ -63,12 +61,12 @@ router.post('/truck-images/:truckId', requireAuth, upload.array('images', 10), a
         }
 
         //process uploaded files
-        const uploadedImages = req.files.map((file, indedx) => ({
+        const uploadedImages = req.files.map((file, index) => ({
             url: `/uploads/trucks/${truckId}/${file.filename}`,
             caption: req.body.captions ? req.body.captions[index] || `Image ${index + 1}` : `Image ${index + 1}`,
             isPrimary: index === 0 && (!req.body.primaryIndex || req.body.primaryIndex == index),
             filename: file.filename,
-            originalName: file.originalName,
+            originalName: file.originalname,
             size: file.size
         }));
 
@@ -90,11 +88,11 @@ router.post('/truck-images/:truckId', requireAuth, upload.array('images', 10), a
     }
 });
 
-//GET /api/uploads/truck-mages/:truckId - list images for a truck
+//GET /api/uploads/truck-images/:truckId - list images for a truck
 router.get('/truck-images/:truckId', requireAuth, async (req, res) => {
     try {
         const { truckId } = req.params;
-        const imagesPath = path.join(__dirname, '..uploads/trucks', truckId);
+        const imagesPath = path.join(__dirname, '../uploads/trucks', truckId);
 
         if (!await fs.pathExists(imagesPath)) {
             return res.json({
@@ -137,9 +135,7 @@ router.get('/truck-images/:truckId', requireAuth, async (req, res) => {
     }
 });
 
-
-// delete /api/uploads/truck-imagse/:truckId/:filename - delete specific image
-
+// DELETE /api/uploads/truck-images/:truckId/:filename - delete specific image
 router.delete('/truck-images/:truckId/:filename', requireAuth, async (req, res) => {
     try {
         const { truckId, filename } = req.params;
@@ -179,7 +175,6 @@ router.delete('/truck-images/:truckId/:filename', requireAuth, async (req, res) 
     }
 });
 
-
 //DELETE /api/uploads/truck-images/:truckId - delete all images for a truck
 router.delete('/truck-images/:truckId', requireAuth, async (req, res) => {
     try {
@@ -204,10 +199,10 @@ router.delete('/truck-images/:truckId', requireAuth, async (req, res) => {
     }
 });
 
-
+// POST /api/uploads/general - upload general images
 router.post('/general', requireAuth, upload.array('images', 5), async (req, res) => {
     try {
-        if (!res.files || req.files.length === 0) {
+        if (!req.files || req.files.length === 0) {
             return res.status(400).json({
                 success: false,
                 error: 'No files uploaded',
@@ -246,7 +241,6 @@ router.post('/general', requireAuth, upload.array('images', 5), async (req, res)
         });
     }
 });
-
 
 // error handling middleware for multer
 router.use((error, req, res, next) => {

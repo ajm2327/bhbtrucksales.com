@@ -236,7 +236,7 @@ router.get('/', requireAuth, async (req, res) => {
             background: white;
             border-radius: 0.5rem;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.25);
@@ -318,44 +318,88 @@ router.get('/', requireAuth, async (req, res) => {
             text-align: center;
             cursor: pointer;
             transition: border-color 0.2s;
+            background: #f9fafb;
         }
 
         .image-upload:hover {
             border-color: #1e40af;
+            background: #eff6ff;
+        }
+
+        .image-upload.dragover {
+            border-color: #1e40af;
+            background: #eff6ff;
         }
 
         .image-preview {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 1rem;
-            flex-wrap: wrap;
             margin-top: 1rem;
         }
 
         .preview-item {
             position: relative;
-            width: 100px;
-            height: 80px;
+            aspect-ratio: 4/3;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: #f3f4f6;
         }
 
         .preview-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 0.25rem;
         }
 
-        .preview-remove {
+        .preview-controls {
             position: absolute;
-            top: -0.5rem;
-            right: -0.5rem;
-            background: #dc2626;
+            top: 0.25rem;
+            right: 0.25rem;
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .preview-btn {
+            background: rgba(0,0,0,0.7);
             color: white;
             border: none;
-            border-radius: 50%;
+            border-radius: 0.25rem;
             width: 1.5rem;
             height: 1.5rem;
             font-size: 0.75rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-btn:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        .primary-indicator {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            background: #059669;
+            color: white;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.625rem;
+            font-weight: 600;
+        }
+
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.25rem;
+            font-size: 0.75rem;
         }
 
         .modal-footer {
@@ -405,6 +449,21 @@ router.get('/', requireAuth, async (req, res) => {
             margin-bottom: 0.5rem;
         }
 
+        .upload-progress {
+            background: #e5e7eb;
+            border-radius: 0.25rem;
+            height: 0.5rem;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .upload-progress-bar {
+            background: #059669;
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 0.25rem;
+        }
+
         @media (max-width: 768px) {
             .admin-header {
                 flex-direction: column;
@@ -428,6 +487,10 @@ router.get('/', requireAuth, async (req, res) => {
             .trucks-table th,
             .trucks-table td {
                 padding: 0.5rem;
+            }
+
+            .image-preview {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
         }
     </style>
@@ -551,6 +614,23 @@ router.get('/', requireAuth, async (req, res) => {
                             <label for="overview">Overview</label>
                             <textarea id="overview" name="overview" placeholder="Detailed description of the truck..."></textarea>
                         </div>
+                        
+                        <!-- Image Upload Section -->
+                        <div class="form-group full-width">
+                            <label>Truck Images</label>
+                            <div class="image-upload" onclick="triggerImageUpload()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                <div style="pointer-events: none;">
+                                    <div style="font-size: 2rem; margin-bottom: 1rem;">📸</div>
+                                    <p><strong>Click to upload</strong> or drag and drop images here</p>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Supports JPG, PNG, GIF, WebP (max 10MB each)</p>
+                                </div>
+                                <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                            </div>
+                            <div class="image-preview" id="imagePreview">
+                                <!-- Images will be displayed here -->
+                            </div>
+                        </div>
+                        
                         <div class="form-group full-width">
                             <label>Status Options</label>
                             <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
@@ -586,11 +666,100 @@ router.get('/', requireAuth, async (req, res) => {
         let allTrucks = window.trucksData.trucks || [];
         let filteredTrucks = [...allTrucks];
         let editingTruckId = null;
+        let truckImages = []; // Store images for current truck
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             renderTrucksTable();
         });
+
+        // Image upload functions
+        function triggerImageUpload() {
+            document.getElementById('imageUpload').click();
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processImageFiles(files);
+        }
+
+        function handleImageUpload(e) {
+            const files = e.target.files;
+            processImageFiles(files);
+        }
+
+        function processImageFiles(files) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
+            for (let file of files) {
+                if (!allowedTypes.includes(file.type)) {
+                    showNotification(\`\${file.name} is not a supported image format\`, 'error');
+                    continue;
+                }
+
+                if (file.size > maxSize) {
+                    showNotification(\`\${file.name} is too large (max 10MB)\`, 'error');
+                    continue;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = {
+                        file: file,
+                        url: e.target.result,
+                        caption: \`\${file.name.replace(/\\.[^/.]+$/, "")}\`,
+                        isPrimary: truckImages.length === 0
+                    };
+                    truckImages.push(imageData);
+                    renderImagePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = truckImages.map((img, index) => \`
+                <div class="preview-item">
+                    <img src="\${img.url}" alt="Preview \${index + 1}">
+                    \${img.isPrimary ? '<div class="primary-indicator">Primary</div>' : ''}
+                    <div class="preview-controls">
+                        \${!img.isPrimary ? \`<button type="button" class="preview-btn" onclick="setPrimaryImage(\${index})" title="Set as primary">★</button>\` : ''}
+                        <button type="button" class="preview-btn" onclick="removeImage(\${index})" title="Remove">×</button>
+                    </div>
+                    <div class="image-caption">\${img.caption}</div>
+                </div>
+            \`).join('');
+        }
+
+        function setPrimaryImage(index) {
+            truckImages.forEach((img, i) => {
+                img.isPrimary = i === index;
+            });
+            renderImagePreview();
+        }
+
+        function removeImage(index) {
+            truckImages.splice(index, 1);
+            // If we removed the primary image, make the first one primary
+            if (truckImages.length > 0 && !truckImages.some(img => img.isPrimary)) {
+                truckImages[0].isPrimary = true;
+            }
+            renderImagePreview();
+        }
 
         // Render trucks table
         function renderTrucksTable() {
@@ -677,8 +846,10 @@ router.get('/', requireAuth, async (req, res) => {
         // Modal functions
         function openAddModal() {
             editingTruckId = null;
+            truckImages = []; // Clear images
             document.getElementById('modalTitle').textContent = 'Add New Truck';
             document.getElementById('truckForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
             document.getElementById('truckModal').classList.add('show');
         }
 
@@ -701,18 +872,33 @@ router.get('/', requireAuth, async (req, res) => {
                 }
             });
 
+            // Load existing images
+            truckImages = truck.images ? truck.images.map(img => ({
+                ...img,
+                existing: true // Mark as existing image
+            })) : [];
+            renderImagePreview();
+
             document.getElementById('truckModal').classList.add('show');
         }
 
         function closeModal() {
             document.getElementById('truckModal').classList.remove('show');
             document.getElementById('truckForm').reset();
+            truckImages = [];
             editingTruckId = null;
         }
 
         // CRUD operations
         async function saveTruck(formData) {
             try {
+                // Add images to form data
+                formData.images = truckImages.map(img => ({
+                    url: img.existing ? img.url : \`/uploads/trucks/\${editingTruckId || 'temp'}/\${img.file?.name || 'uploaded.jpg'}\`,
+                    caption: img.caption || 'Truck Image',
+                    isPrimary: img.isPrimary || false
+                }));
+
                 const url = editingTruckId ? \`/api/trucks/\${editingTruckId}\` : '/api/trucks';
                 const method = editingTruckId ? 'PUT' : 'POST';
 
@@ -728,6 +914,11 @@ router.get('/', requireAuth, async (req, res) => {
                 const result = await response.json();
 
                 if (result.success) {
+                    // Upload images if we have new ones
+                    if (truckImages.some(img => !img.existing)) {
+                        await uploadImages(result.data.id);
+                    }
+
                     showNotification(\`Truck \${editingTruckId ? 'updated' : 'created'} successfully!\`, 'success');
                     await refreshTrucks();
                     closeModal();
@@ -737,6 +928,33 @@ router.get('/', requireAuth, async (req, res) => {
             } catch (error) {
                 console.error('Save error:', error);
                 showNotification('Failed to save truck', 'error');
+            }
+        }
+
+        async function uploadImages(truckId) {
+            const newImages = truckImages.filter(img => !img.existing);
+            if (newImages.length === 0) return;
+
+            try {
+                const formData = new FormData();
+                newImages.forEach((img, index) => {
+                    formData.append('images', img.file);
+                    formData.append('captions', img.caption);
+                });
+
+                const response = await fetch(\`/api/uploads/truck-images/\${truckId}\`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    showNotification('Images uploaded but some failed to save', 'error');
+                }
+            } catch (error) {
+                console.error('Image upload error:', error);
+                showNotification('Failed to upload images', 'error');
             }
         }
 
@@ -796,8 +1014,9 @@ router.get('/', requireAuth, async (req, res) => {
         // Refresh trucks data
         async function refreshTrucks() {
             try {
-                const response = await fetch('/api/trucks',{
-                credentials: 'include'});
+                const response = await fetch('/api/trucks', {
+                    credentials: 'include'
+                });
                 const result = await response.json();
                 
                 if (result.success) {
@@ -850,10 +1069,14 @@ router.get('/', requireAuth, async (req, res) => {
 
         async function logout() {
             try {
-                await fetch('/api/auth/logout', { method: 'POST' });
+                await fetch('/api/auth/logout', { 
+                    method: 'POST',
+                    credentials: 'include'
+                });
                 window.location.href = '/admin/login';
             } catch (error) {
                 console.error('Logout error:', error);
+                window.location.href = '/admin/login';
             }
         }
 
@@ -881,7 +1104,5 @@ router.get('/', requireAuth, async (req, res) => {
         res.status(500).send('Error loading dashboard');
     }
 });
-
-
 
 module.exports = router;

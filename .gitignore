@@ -2,7 +2,8 @@
 bhbtrucksales/node_modules/
 bhbtrucksales/package-lock.json
 backend/node_modules/
-backend/package-lock.json
+backend/package-lock.json\
+backend/.env
 
 
 # Build outputs

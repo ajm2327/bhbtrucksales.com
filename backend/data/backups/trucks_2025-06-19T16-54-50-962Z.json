@@ -11,18 +11,7 @@
             "price": 185000,
             "isAvailable": true,
             "isFeatured": true,
-            "images": [
-                {
-                    "url": "/uploads/trucks/western-star-49x-wc2899/image1.jpg",
-                    "caption": "Front view",
-                    "isPrimary": true
-                },
-                {
-                    "url": "/uploads/trucks/western-star-49x-wc2899/image2.jpg",
-                    "caption": "Side view",
-                    "isPrimary": false
-                }
-            ],
+            "images": [],
             "engine": "Detroit DD15 505HP",
             "transmission": "12 Spd Automated-Manual",
             "drivetrain": "6x4",
@@ -61,5 +50,5 @@
             "isActive": true
         }
     ],
-    "lastUpdated": "2025-06-18T00:00:00Z"
+    "lastUpdated": "2025-06-19T00:00:00Z"
 }
