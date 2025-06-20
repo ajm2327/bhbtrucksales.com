@@ -62,10 +62,10 @@ const TruckCard = ({ truck }) => {
                 {truck.condition && (
                     <div className="absolute top-3 right-3">
                         <span className={`px-3 py-1 rounded text-xs font-semibold ${truck.condition === 'New'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
-                                : truck.condition === 'Used'
-                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                            : truck.condition === 'Used'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                                : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
                             }`}>
                             {truck.condition}
                         </span>

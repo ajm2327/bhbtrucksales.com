@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
+import TruckCard from '../components/TruckCard/TruckCard'
 
 const HomePage = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [siteSettings, setSiteSettings] = useState(null)
     const [trucksCount, setTrucksCount] = useState(0)
+    const [trucks, setTrucks] = useState([])
     const [announcementDismissed, setAnnouncementDismissed] = useState(() => {
         return localStorage.getItem('announcementDismissed') === 'true'
     })
@@ -25,6 +27,18 @@ const HomePage = () => {
                     const trucksData = await trucksResponse.json()
                     if (trucksData.success) {
                         setTrucksCount(trucksData.data.total)
+
+                        // Sort trucks - featured first, then by date added (newest first)
+                        const sortedTrucks = trucksData.data.trucks.sort((a, b) => {
+                            // Featured trucks first
+                            if (a.isFeatured && !b.isFeatured) return -1
+                            if (!a.isFeatured && b.isFeatured) return 1
+
+                            // Then by date added (newest first)
+                            return new Date(b.dateAdded) - new Date(a.dateAdded)
+                        })
+
+                        setTrucks(sortedTrucks)
                     }
                 }
 
@@ -96,7 +110,7 @@ const HomePage = () => {
                     </div>
                 )}
 
-                {/* Hero Banner */}
+                {/* Hero Banner - Clean without overlays or buttons */}
                 <section
                     className="relative w-full h-screen flex items-center justify-center overflow-hidden"
                     style={{
@@ -121,54 +135,14 @@ const HomePage = () => {
                             Find the perfect commercial vehicle for your business needs
                         </p>
 
-                        {/* Truck Count */}
-                        <div className="mb-8">
-                            <div className="inline-block bg-white/90 text-gray-900 px-6 py-4 rounded-xl shadow-lg">
-                                <div className="flex items-center space-x-2">
-                                    <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707L16 7.586A1 1 0 0015.414 7H14z" />
-                                    </svg>
-                                    <div>
-                                        <div className="text-2xl font-bold text-primary-600">
-                                            {loading ? '...' : trucksCount}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Trucks Available</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                            <button
-                                onClick={scrollToInventory}
-                                className="inline-flex items-center space-x-2 bg-white text-gray-900 hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                <span>Browse Inventory</span>
-                            </button>
-
-                            <a
-                                href="/contact"
-                                className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                <span>Get In Touch</span>
-                            </a>
-                        </div>
-
-                        {/* Scroll Down Indicator */}
+                        {/* Browse Inventory Button */}
                         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
                             <button
                                 onClick={scrollToInventory}
-                                className="animate-bounce text-white/80 hover:text-white transition-colors duration-200"
+                                className="bg-white/90 hover:bg-white text-gray-900 font-semibold py-4 px-10 rounded-full transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
                             >
-                                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span className="whitespace-nowrap">Browse Our Inventory</span>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                 </svg>
                             </button>
@@ -211,15 +185,37 @@ const HomePage = () => {
                     </section>
                 )}
 
-                {/* Inventory Section Placeholder */}
+                {/* Inventory Section with Truck Count Badge */}
                 <div id="inventory" className="w-full py-16 bg-gray-100 dark:bg-gray-800">
-                    <div className="max-w-6xl mx-auto px-4 text-center">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                            Our Truck Inventory
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Truck listings will appear here...
-                        </p>
+                    <div className="max-w-6xl mx-auto px-4">
+
+                        {/* Inventory Header */}
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                                Our Truck Inventory
+                            </h2>
+                        </div>
+
+                        {/* Trucks Grid */}
+                        {!loading && !error && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {trucks.length > 0 ? (
+                                    trucks.map((truck) => (
+                                        <TruckCard key={truck.id} truck={truck} />
+                                    ))
+                                ) : (
+                                    <div className="col-span-full text-center py-12">
+                                        <div className="text-gray-400 text-6xl mb-4">🚛</div>
+                                        <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                            No Trucks Available
+                                        </h3>
+                                        <p className="text-gray-500 dark:text-gray-400">
+                                            Check back soon for new inventory!
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
