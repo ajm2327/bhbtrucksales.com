@@ -8,6 +8,8 @@ router.get('/', requireAuth, async (req, res) => {
     try {
         // Fetch trucks data
         const trucksData = await fileManager.getTrucks();
+        const siteSettings = await fileManager.getSiteSettings();
+        const aboutPage = await fileManager.getAboutPage();
 
         // Create HTML dashboard
         const dashboardHTML = `
@@ -509,7 +511,11 @@ router.get('/', requireAuth, async (req, res) => {
     <main class="admin-main">
         <!-- Action Bar -->
         <div class="action-bar">
-            <button class="btn btn-primary" onclick="openAddModal()">+ Add New Truck</button>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" onclick="openAddModal()">+ Add New Truck</button>
+                <button class="btn btn-secondary" onclick="openSiteSettingsModal()">Site Settings</button>
+                <button class="btn btn-secondary" onclick="openAboutPageModal()">About Page</button>
+            </div>
             <div class="search-filter">
                 <input type="text" placeholder="Search trucks..." id="searchInput" onkeyup="filterTrucks()">
                 <select id="filterCondition" onchange="filterTrucks()">
@@ -557,98 +563,152 @@ router.get('/', requireAuth, async (req, res) => {
             </div>
             <form id="truckForm">
                 <div class="modal-body">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="year">Year *</label>
-                            <input type="number" id="year" name="year" required min="1900" max="2030">
-                        </div>
-                        <div class="form-group">
-                            <label for="make">Make *</label>
-                            <input type="text" id="make" name="make" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="model">Model *</label>
-                            <input type="text" id="model" name="model" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="condition">Condition</label>
-                            <select id="condition" name="condition">
-                                <option value="New">New</option>
-                                <option value="Used">Used</option>
-                                <option value="Certified">Certified</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="stockNumber">Stock Number</label>
-                            <input type="text" id="stockNumber" name="stockNumber">
-                        </div>
-                        <div class="form-group">
-                            <label for="vinNumber">VIN Number</label>
-                            <input type="text" id="vinNumber" name="vinNumber">
-                        </div>
-                        <div class="form-group">
-                            <label for="price">Price</label>
-                            <input type="number" id="price" name="price">
-                        </div>
-                        <div class="form-group">
-                            <label for="engine">Engine</label>
-                            <input type="text" id="engine" name="engine">
-                        </div>
-                        <div class="form-group">
-                            <label for="transmission">Transmission</label>
-                            <input type="text" id="transmission" name="transmission">
-                        </div>
-                        <div class="form-group">
-                            <label for="drivetrain">Drivetrain</label>
-                            <input type="text" id="drivetrain" name="drivetrain">
-                        </div>
-                        <div class="form-group">
-                            <label for="exteriorColor">Exterior Color</label>
-                            <input type="text" id="exteriorColor" name="exteriorColor">
-                        </div>
-                        <div class="form-group">
-                            <label for="interiorColor">Interior Color</label>
-                            <input type="text" id="interiorColor" name="interiorColor">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="overview">Overview</label>
-                            <textarea id="overview" name="overview" placeholder="Detailed description of the truck..."></textarea>
-                        </div>
-                        
-                        <!-- Image Upload Section -->
-                        <div class="form-group full-width">
-                            <label>Truck Images</label>
-                            <div class="image-upload" onclick="triggerImageUpload()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                                <div style="pointer-events: none;">
-                                    <div style="font-size: 2rem; margin-bottom: 1rem;">📸</div>
-                                    <p><strong>Click to upload</strong> or drag and drop images here</p>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Supports JPG, PNG, GIF, WebP (max 10MB each)</p>
+                    <!-- Truck Form Section -->
+                    <div id="truckFormSection">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="year">Year *</label>
+                                <input type="number" id="year" name="year" required min="1900" max="2030">
+                            </div>
+                            <div class="form-group">
+                                <label for="make">Make *</label>
+                                <input type="text" id="make" name="make" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="model">Model *</label>
+                                <input type="text" id="model" name="model" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="condition">Condition</label>
+                                <select id="condition" name="condition">
+                                    <option value="New">New</option>
+                                    <option value="Used">Used</option>
+                                    <option value="Certified">Certified</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockNumber">Stock Number</label>
+                                <input type="text" id="stockNumber" name="stockNumber">
+                            </div>
+                            <div class="form-group">
+                                <label for="vinNumber">VIN Number</label>
+                                <input type="text" id="vinNumber" name="vinNumber">
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Price</label>
+                                <input type="number" id="price" name="price">
+                            </div>
+                            <div class="form-group">
+                                <label for="engine">Engine</label>
+                                <input type="text" id="engine" name="engine">
+                            </div>
+                            <div class="form-group">
+                                <label for="transmission">Transmission</label>
+                                <input type="text" id="transmission" name="transmission">
+                            </div>
+                            <div class="form-group">
+                                <label for="drivetrain">Drivetrain</label>
+                                <input type="text" id="drivetrain" name="drivetrain">
+                            </div>
+                            <div class="form-group">
+                                <label for="exteriorColor">Exterior Color</label>
+                                <input type="text" id="exteriorColor" name="exteriorColor">
+                            </div>
+                            <div class="form-group">
+                                <label for="interiorColor">Interior Color</label>
+                                <input type="text" id="interiorColor" name="interiorColor">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="overview">Overview</label>
+                                <textarea id="overview" name="overview" placeholder="Detailed description of the truck..."></textarea>
+                            </div>
+                            
+                            <!-- Image Upload Section -->
+                            <div class="form-group full-width">
+                                <label>Truck Images</label>
+                                <div class="image-upload" onclick="triggerImageUpload()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                    <div style="pointer-events: none;">
+                                        <div style="font-size: 2rem; margin-bottom: 1rem;">📸</div>
+                                        <p><strong>Click to upload</strong> or drag and drop images here</p>
+                                        <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Supports JPG, PNG, GIF, WebP (max 10MB each)</p>
+                                    </div>
+                                    <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                                 </div>
-                                <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                                <div class="image-preview" id="imagePreview">
+                                    <!-- Images will be displayed here -->
+                                </div>
                             </div>
-                            <div class="image-preview" id="imagePreview">
-                                <!-- Images will be displayed here -->
+                            
+                            <div class="form-group full-width">
+                                <label>Status Options</label>
+                                <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                        <input type="checkbox" id="isAvailable" name="isAvailable" checked>
+                                        Available for Sale
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                        <input type="checkbox" id="isFeatured" name="isFeatured">
+                                        Featured Truck
+                                    </label>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Site Settings Section (initially hidden) -->
+                    <div id="siteSettingsSection" style="display: none;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.2rem; font-weight: 600;">Site Settings</h3>
                         
-                        <div class="form-group full-width">
-                            <label>Status Options</label>
-                            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <!-- Announcement Management -->
+                        <div class="form-group">
+                            <label>Announcement Banner</label>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                    <input type="checkbox" id="isAvailable" name="isAvailable" checked>
-                                    Available for Sale
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                    <input type="checkbox" id="isFeatured" name="isFeatured">
-                                    Featured Truck
+                                    <input type="checkbox" id="announcementActive"> Active
                                 </label>
                             </div>
+                            <input type="text" id="announcementTitle" placeholder="Announcement title...">
+                            <textarea id="announcementMessage" placeholder="Announcement message..." style="margin-top: 0.5rem;"></textarea>
+                        </div>
+
+                        <!-- Banner Management -->
+                        <div class="form-group">
+                            <label>Hero Banner Image</label>
+                            <div class="image-upload" onclick="triggerBannerUpload()" ondrop="handleBannerDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                <div style="pointer-events: none;">
+                                    <div style="font-size: 2rem; margin-bottom: 1rem;">🖼️</div>
+                                    <p><strong>Click to upload banner image</strong></p>
+                                </div>
+                                <input type="file" id="bannerUpload" accept="image/*" style="display: none;" onchange="handleBannerUpload(event)">
+                            </div>
+                            <div id="bannerPreview" style="margin-top: 1rem;"></div>
+                            <input type="text" id="bannerAltText" placeholder="Alt text..." style="margin-top: 0.5rem;">
+                        </div>
+                    </div>
+
+                    <!-- About Page Section (initially hidden) -->
+                    <div id="aboutPageSection" style="display: none;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.2rem; font-weight: 600;">About Page Content</h3>
+                        
+                        <div class="form-group">
+                            <label for="aboutTitle">Page Title</label>
+                            <input type="text" id="aboutTitle" placeholder="About page title...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Content Sections</label>
+                            <div id="aboutContentContainer">
+                                <!-- Content sections will be populated by JavaScript -->
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="addAboutSection()">+ Add Section</button>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveBtn">Save Truck</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSiteSettings()" id="saveSettingsBtn" style="display: none;">Save Settings</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAboutPage()" id="saveAboutBtn" style="display: none;">Save About Page</button>
                 </div>
             </form>
         </div>
@@ -656,11 +716,13 @@ router.get('/', requireAuth, async (req, res) => {
 
     <!-- Embedded Data -->
     <script>
-        window.trucksdata = ${JSON.stringify(trucksData)};
+        window.trucksData = ${JSON.stringify(trucksData)};
+        window.siteSettings = ${JSON.stringify(siteSettings)};
+        window.aboutPage = ${JSON.stringify(aboutPage)};
         window.csrfToken = "${Date.now()}";
     </script>
 
-    <script src=/admin-dashboard.js></script>
+    <script src="/admin-dashboard.js"></script>
 
 </body>
 </html>

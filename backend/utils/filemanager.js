@@ -171,6 +171,80 @@ class FileManager {
     }
 
     /**
+     * Get site settings data
+     * @returns {Object} site settings
+     */
+    async getSiteSettings() {
+        try {
+            const data = await this.getTrucks();
+            return data.siteSettings || {
+                announcement: {
+                    isActive: false,
+                    title: "",
+                    message: "",
+                    createdAt: ""
+                },
+                banner: {
+                    imageUrl: "",
+                    altText: "BHB Truck Sales"
+                }
+            };
+        } catch (error) {
+            console.error('Error getting site settings:', error);
+            return null;
+        }
+    }
+
+    /** 
+     * get about page content
+     * @returns {Object} about page data
+     */
+    async getAboutPage() {
+        try {
+            const data = await this.getTrucks();
+            return data.aboutPage || {
+                title: "About BHB Truck Sales",
+                content: []
+            };
+        } catch (error) {
+            console.error('Error getting about page:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Update site settings
+     * @param {Object} siteSettings
+     * @returns {boolean}
+     */
+    async saveSiteSettings(siteSettings) {
+        try {
+            const data = await this.getTrucks();
+            data.siteSettings = siteSettings;
+            return await this.writeJSON('trucks.json', data);
+        } catch (error) {
+            console.error('Error saving site settings:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update about page content
+     * @param {Object}
+     * @returns {boolean}
+     */
+    async saveAboutPage(aboutPageData) {
+        try {
+            const data = await this.getTrucks();
+            data.aboutPage = aboutPageData;
+            return await this.writeJSON('trucks.json', data);
+        } catch (error) {
+            console.error('Error saving about page:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Check if file exists
      * @param {string} filename
      * @returns {boolean}

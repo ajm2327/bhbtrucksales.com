@@ -290,4 +290,61 @@ router.patch('/:id/toggle',
     }
 );
 
+// site settings 
+//get /api/trucks/site-settings - get site settings (public)
+router.get('/site-settings', auditLog, async (req, res) => {
+    try {
+        const siteSettings = await fileManager.getSiteSettings();
+        successResponse(res, siteSettings);
+    } catch (error) {
+        console.error('Error fetching site settings:', error);
+        errorResponse(res, 500, 'Failed to fetch site settings', 'FETCH_ERROR');
+    }
+});
+
+// put /api/trucks/site-settings  update site settings (ADMIN ONLY)
+router.put('/site-settings',
+    requireAuth,
+    autoBackup('trucks.json'),
+    auditLog,
+    async (req, res) => {
+        try {
+            await fileManager.saveSiteSettings(req.body);
+            successResponse(res, req.body, 'Site settings updated successfully');
+        } catch (error) {
+            console.error('Error updating site settings:', error);
+            errorResponse(res, 500, 'Failed to update site settings', 'UPDATE_ERROR');
+        }
+    }
+);
+
+// GET /api/trucks/about-page - get about page content (public)
+router.get('/about-page', auditLog, async (req, res) => {
+    try {
+        const aboutPage = await fileManager.getAboutPage();
+        successResponse(res, aboutPage);
+
+    } catch (error) {
+        console.error('Error fetching about page:', error);
+        errorResponse(res, 500, 'Failed to fetch about page', 'FETCH_ERROR');
+    }
+});
+
+// PUT /api/trucks/about-page - UPDATE about page content (ADMIN ONLY)
+router.put('/about-page',
+    requireAuth,
+    autoBackup('trucks.json'),
+    auditLog,
+    async (req, res) => {
+        try {
+            await fileManager.saveAboutPage(req.body);
+            successResponse(res, req.body, 'About page updated successfully');
+
+        } catch (error) {
+            console.error('Error updating about page:', error);
+            errorResponse(res, 500, 'Failed to update about page', 'UPDATE_ERROR');
+        }
+    }
+);
+
 module.exports = router;

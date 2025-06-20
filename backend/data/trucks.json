@@ -135,7 +135,61 @@
       "dateAdded": "2025-06-19T23:53:33.931Z",
       "lastModified": "2025-06-19T23:54:50.741Z",
       "isActive": true
+    },
+    {
+      "id": "2000-test-truck-1750380763911",
+      "year": 2000,
+      "make": "test",
+      "model": "truck",
+      "condition": "New",
+      "price": null,
+      "isAvailable": true,
+      "isFeatured": false,
+      "images": [],
+      "dateAdded": "2025-06-20T00:52:43.911Z",
+      "lastModified": "2025-06-20T00:52:43.911Z",
+      "isActive": true
+    },
+    {
+      "id": "2020-test-truck-1750386049717",
+      "year": 2020,
+      "make": "test",
+      "model": "truck",
+      "condition": "New",
+      "price": null,
+      "overview": "making sure this dind't break",
+      "isAvailable": false,
+      "isFeatured": false,
+      "images": [],
+      "dateAdded": "2025-06-20T02:20:49.717Z",
+      "lastModified": "2025-06-20T02:20:49.717Z",
+      "isActive": true
     }
   ],
-  "lastUpdated": "2025-06-19T23:54:50.745Z"
+  "siteSettings": {
+    "announcement": {
+      "isActive": false,
+      "title": "",
+      "message": "",
+      "createdAt": ""
+    },
+    "banner": {
+      "imageUrl": "",
+      "altText": "BHB Truck Sales"
+    }
+  },
+  "aboutPage": {
+    "title": "About BHB Truck Sales",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "We are a family-owned business specializing in quality commercial trucks. With years of experience in the industry, we pride ourselves on providing reliable vehicles and exceptional customer service."
+      },
+      {
+        "type": "paragraph",
+        "text": "Our team is dedicated to helping you find the perfect truck for your business needs. We're here to help."
+      }
+    ]
+  },
+  "lastUpdated": "2025-06-20T02:20:49.721Z"
 }

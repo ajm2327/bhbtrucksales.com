@@ -1,13 +1,31 @@
 
 // Global variables
-let allTrucks = window.trucksData.trucks || [];
-let filteredTrucks = [...allTrucks];
+let allTrucks = [];
+let filteredTrucks = [];
 let editingTruckId = null;
 let truckImages = []; // Store images for current truck
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function () {
-    renderTrucksTable();
+    console.log('DOM loaded, checking for data...');
+    console.log('window.trucksData:', window.trucksData);
+
+    // Wait for data to be available with multiple checks
+    if (window.trucksData) {
+        console.log('Found trucksData:', window.trucksData);
+        if (window.trucksData.trucks && Array.isArray(window.trucksData.trucks)) {
+            allTrucks = window.trucksData.trucks;
+            filteredTrucks = [...allTrucks];
+            console.log(`Loaded ${allTrucks.length} trucks`);
+            renderTrucksTable();
+        } else {
+            console.error('trucksData.trucks is not an array:', window.trucksData);
+            showNotification('Invalid truck data format', 'error');
+        }
+    } else {
+        console.error('window.trucksData is not available');
+        showNotification('Failed to load truck data', 'error');
+    }
 });
 
 // Image upload functions
@@ -434,40 +452,47 @@ async function refreshTrucks() {
 }
 
 // Form submission
-document.getElementById('truckForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Form submission - wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('truckForm');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
 
-    const formData = new FormData(e.target);
-    const truckData = {};
+            e.preventDefault();
 
-    // Convert FormData to object
-    for (let [key, value] of formData.entries()) {
-        if (key === 'isAvailable' || key === 'isFeatured') {
-            truckData[key] = true; // Checkbox was checked
-        } else if (key === 'year') {
-            // Year must be a number, not null
-            truckData[key] = value ? Number(value) : undefined;
-        } else if (key === 'price') {
-            // Price is just a string field like everything else
-            truckData[key] = value.trim() || null;
-        } else {
-            // Don't send empty strings, send undefined instead
-            truckData[key] = value.trim() || undefined;
-        }
+            const formData = new FormData(e.target);
+            const truckData = {};
+
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (key === 'isAvailable' || key === 'isFeatured') {
+                    truckData[key] = true; // Checkbox was checked
+                } else if (key === 'year') {
+                    // Year must be a number, not null
+                    truckData[key] = value ? Number(value) : undefined;
+                } else if (key === 'price') {
+                    // Price is just a string field like everything else
+                    truckData[key] = value.trim() || null;
+                } else {
+                    // Don't send empty strings, send undefined instead
+                    truckData[key] = value.trim() || undefined;
+                }
+            }
+
+            // Remove undefined values to avoid sending them
+            Object.keys(truckData).forEach(key => {
+                if (truckData[key] === undefined) {
+                    delete truckData[key];
+                }
+            });
+
+            // Set unchecked checkboxes to false
+            if (!truckData.isAvailable) truckData.isAvailable = false;
+            if (!truckData.isFeatured) truckData.isFeatured = false;
+
+            await saveTruck(truckData);
+        });
     }
-
-    // Remove undefined values to avoid sending them
-    Object.keys(truckData).forEach(key => {
-        if (truckData[key] === undefined) {
-            delete truckData[key];
-        }
-    });
-
-    // Set unchecked checkboxes to false
-    if (!truckData.isAvailable) truckData.isAvailable = false;
-    if (!truckData.isFeatured) truckData.isFeatured = false;
-
-    await saveTruck(truckData);
 });
 
 // Utility functions
@@ -508,3 +533,298 @@ document.getElementById('truckModal').addEventListener('click', (e) => {
         closeModal();
     }
 });
+
+
+// Site Settings and About Page Management Functions
+function openSiteSettingsModal() {
+    document.getElementById('modalTitle').textContent = 'Site Settings';
+
+    // Hide truck form, show site settings
+    document.getElementById('truckFormSection').style.display = 'none';
+    document.getElementById('siteSettingsSection').style.display = 'block';
+    document.getElementById('aboutPageSection').style.display = 'none';
+
+    // Show/hide correct save buttons
+    document.getElementById('saveBtn').style.display = 'none';
+    document.getElementById('saveSettingsBtn').style.display = 'block';
+    document.getElementById('saveAboutBtn').style.display = 'none';
+
+    // Populate current settings
+    const settings = window.siteSettings;
+    document.getElementById('announcementActive').checked = settings.announcement.isActive;
+    document.getElementById('announcementTitle').value = settings.announcement.title;
+    document.getElementById('announcementMessage').value = settings.announcement.message;
+    document.getElementById('bannerAltText').value = settings.banner.altText;
+
+    document.getElementById('truckModal').classList.add('show');
+}
+
+// Banner upload functions
+function triggerBannerUpload() {
+    document.getElementById('bannerUpload').click();
+}
+
+function handleBannerDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) processBannerFile(files[0]);
+}
+
+function handleBannerUpload(e) {
+    const files = e.target.files;
+    if (files.length > 0) processBannerFile(files[0]);
+}
+
+function processBannerFile(file) {
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+        showNotification('Please select a valid image file', 'error');
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        showNotification('Image too large (max 10MB)', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        window.bannerImageData = { file: file, url: e.target.result };
+        renderBannerPreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+function renderBannerPreview() {
+    const preview = document.getElementById('bannerPreview');
+    if (window.bannerImageData) {
+        preview.innerHTML = `
+            <div style="position: relative; display: inline-block;">
+                <img src="${window.bannerImageData.url}" alt="Banner preview" style="max-width: 200px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+                <button type="button" onclick="removeBannerImage()" style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px;">×</button>
+            </div>
+        `;
+    } else {
+        preview.innerHTML = '';
+    }
+}
+
+function removeBannerImage() {
+    window.bannerImageData = null;
+    renderBannerPreview();
+}
+
+
+function openAboutPageModal() {
+    document.getElementById('modalTitle').textContent = 'About Page Content';
+
+    // Hide truck form, show about page
+    document.getElementById('truckFormSection').style.display = 'none';
+    document.getElementById('siteSettingsSection').style.display = 'none';
+    document.getElementById('aboutPageSection').style.display = 'block';
+
+    // Show/hide correct save buttons
+    document.getElementById('saveBtn').style.display = 'none';
+    document.getElementById('saveSettingsBtn').style.display = 'none';
+    document.getElementById('saveAboutBtn').style.display = 'block';
+
+    // Populate current about page data
+    const aboutData = window.aboutPage;
+    document.getElementById('aboutTitle').value = aboutData.title;
+    renderAboutContent(aboutData.content);
+
+    document.getElementById('truckModal').classList.add('show');
+}
+
+function renderAboutContent(content) {
+    const container = document.getElementById('aboutContentContainer');
+    container.innerHTML = content.map((section, index) => `
+        <div class="about-section" style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <select onchange="changeAboutSectionType(${index}, this.value)" style="margin-right: 1rem;">
+                    <option value="paragraph" ${section.type === 'paragraph' ? 'selected' : ''}>Paragraph</option>
+                    <option value="image" ${section.type === 'image' ? 'selected' : ''}>Image</option>
+                </select>
+                <button type="button" onclick="removeAboutSection(${index})" style="background: #dc2626; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">Remove</button>
+            </div>
+            ${section.type === 'paragraph'
+            ? `<textarea placeholder="Enter paragraph text..." style="width: 100%; min-height: 100px;">${section.text || ''}</textarea>`
+            : `<div>
+                     <div class="image-upload" onclick="triggerAboutImageUpload(${index})" style="margin-bottom: 0.5rem; padding: 1rem;">
+                         <p>Click to upload image</p>
+                         <input type="file" id="aboutImageUpload${index}" accept="image/*" style="display: none;" onchange="handleAboutImageUpload(event, ${index})">
+                     </div>
+                     <div id="aboutImagePreview${index}"></div>
+                     <input type="text" placeholder="Image caption..." value="${section.caption || ''}" style="width: 100%; margin-top: 0.5rem;">
+                   </div>`
+        }
+        </div>
+    `).join('');
+}
+
+function triggerAboutImageUpload(index) {
+    document.getElementById('aboutImageUpload' + index).click();
+}
+
+function handleAboutImageUpload(e, index) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        if (!window.aboutImages) window.aboutImages = {};
+        window.aboutImages[index] = { file: file, url: e.target.result };
+
+        const preview = document.getElementById('aboutImagePreview' + index);
+        preview.innerHTML = `<img src="${e.target.result}" style="max-width: 150px; height: 80px; object-fit: cover; border-radius: 0.5rem;">`;
+    };
+    reader.readAsDataURL(file);
+}
+
+function addAboutSection() {
+    const aboutData = window.aboutPage;
+    aboutData.content.push({ type: 'paragraph', text: '' });
+    renderAboutContent(aboutData.content);
+}
+
+function removeAboutSection(index) {
+    const aboutData = window.aboutPage;
+    aboutData.content.splice(index, 1);
+    renderAboutContent(aboutData.content);
+}
+
+function changeAboutSectionType(index, newType) {
+    const aboutData = window.aboutPage;
+    if (newType === 'paragraph') {
+        aboutData.content[index] = { type: 'paragraph', text: '' };
+    } else {
+        aboutData.content[index] = { type: 'image', url: '', caption: '' };
+    }
+    renderAboutContent(aboutData.content);
+}
+
+async function saveSiteSettings() {
+    try {
+        let bannerImageUrl = '';
+
+        // Upload banner image if there's one
+        if (window.bannerImageData && window.bannerImageData.file) {
+            const formData = new FormData();
+            formData.append('images', window.bannerImageData.file);
+
+            const uploadResponse = await fetch('/api/uploads/general', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (uploadResult.success) {
+                bannerImageUrl = uploadResult.data.files[0].url;
+            } else {
+                showNotification('Failed to upload banner image', 'error');
+                return;
+            }
+        }
+
+        const settingsData = {
+            announcement: {
+                isActive: document.getElementById('announcementActive').checked,
+                title: document.getElementById('announcementTitle').value,
+                message: document.getElementById('announcementMessage').value,
+                createdAt: new Date().toISOString()
+            },
+            banner: {
+                imageUrl: bannerImageUrl || window.siteSettings.banner.imageUrl,
+                altText: document.getElementById('bannerAltText').value
+            }
+        };
+
+        const response = await fetch('/api/trucks/site-settings', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(settingsData)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            window.siteSettings = settingsData;
+            window.bannerImageData = null;
+            showNotification('Site settings updated successfully!', 'success');
+            closeModal();
+        } else {
+            showNotification(result.error || 'Failed to update settings', 'error');
+        }
+    } catch (error) {
+        console.error('Save error:', error);
+        showNotification('Failed to save settings', 'error');
+    }
+}
+
+async function saveAboutPage() {
+    try {
+        // Collect data from form
+        const aboutData = {
+            title: document.getElementById('aboutTitle').value,
+            content: []
+        };
+
+        // Get all content sections
+        const sections = document.querySelectorAll('.about-section');
+        sections.forEach((section, index) => {
+            const type = section.querySelector('select').value;
+            if (type === 'paragraph') {
+                const text = section.querySelector('textarea').value;
+                if (text.trim()) {
+                    aboutData.content.push({ type: 'paragraph', text: text.trim() });
+                }
+            } else {
+                const inputs = section.querySelectorAll('input');
+                const url = inputs[0].value.trim();
+                const caption = inputs[1].value.trim();
+                if (url) {
+                    aboutData.content.push({ type: 'image', url, caption });
+                }
+            }
+        });
+
+        const response = await fetch('/api/trucks/about-page', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(aboutData)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            window.aboutPage = aboutData;
+            showNotification('About page updated successfully!', 'success');
+            closeModal();
+        } else {
+            showNotification(result.error || 'Failed to update about page', 'error');
+        }
+    } catch (error) {
+        console.error('Save error:', error);
+        showNotification('Failed to save about page', 'error');
+    }
+}
+
+// Update the closeModal function to reset all sections
+function closeModal() {
+    document.getElementById('truckModal').classList.remove('show');
+    document.getElementById('truckForm').reset();
+
+    // Reset all sections visibility
+    document.getElementById('truckFormSection').style.display = 'block';
+    document.getElementById('siteSettingsSection').style.display = 'none';
+    document.getElementById('aboutPageSection').style.display = 'none';
+
+    // Reset buttons
+    document.getElementById('saveBtn').style.display = 'block';
+    document.getElementById('saveSettingsBtn').style.display = 'none';
+    document.getElementById('saveAboutBtn').style.display = 'none';
+
+    truckImages = [];
+    editingTruckId = null;
+}
