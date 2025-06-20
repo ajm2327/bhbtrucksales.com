@@ -8,9 +8,7 @@ const HomePage = () => {
     const [siteSettings, setSiteSettings] = useState(null)
     const [trucksCount, setTrucksCount] = useState(0)
     const [trucks, setTrucks] = useState([])
-    const [announcementDismissed, setAnnouncementDismissed] = useState(() => {
-        return localStorage.getItem('announcementDismissed') === 'true'
-    })
+    const [announcementDismissed, setAnnouncementDismissed] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,7 +58,6 @@ const HomePage = () => {
 
     const dismissAnnouncement = () => {
         setAnnouncementDismissed(true)
-        localStorage.setItem('announcementDismissed', 'true')
     }
 
     const scrollToInventory = () => {

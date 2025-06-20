@@ -59,7 +59,7 @@ const Header = () => {
                         <Link
                             to="/about"
                             style={{
-                                background: isActive('/about') ? '#b91c1c' : '#dc2626',
+                                background: isActive('/about') ? '#7a0000' : '#8B0000',
                                 color: 'white',
                                 padding: '10px 20px',
                                 borderRadius: '20px',
@@ -69,8 +69,8 @@ const Header = () => {
                                 transition: 'all 0.2s ease',
                                 border: 'none'
                             }}
-                            onMouseEnter={(e) => e.target.style.background = '#b91c1c'}
-                            onMouseLeave={(e) => e.target.style.background = isActive('/about') ? '#b91c1c' : '#dc2626'}
+                            onMouseEnter={(e) => e.target.style.background = '#7a0000'}
+                            onMouseLeave={(e) => e.target.style.background = isActive('/about') ? '#7a0000' : '#8B0000'}
                         >
                             About
                         </Link>
@@ -78,7 +78,7 @@ const Header = () => {
                         <Link
                             to="/contact"
                             style={{
-                                background: isActive('/contact') ? '#b91c1c' : '#dc2626',
+                                background: isActive('/contact') ? '#7a0000' : '#8B0000',
                                 color: 'white',
                                 padding: '10px 20px',
                                 borderRadius: '20px',
@@ -88,8 +88,8 @@ const Header = () => {
                                 transition: 'all 0.2s ease',
                                 border: 'none'
                             }}
-                            onMouseEnter={(e) => e.target.style.background = '#b91c1c'}
-                            onMouseLeave={(e) => e.target.style.background = isActive('/contact') ? '#b91c1c' : '#dc2626'}
+                            onMouseEnter={(e) => e.target.style.background = '#7a0000'}
+                            onMouseLeave={(e) => e.target.style.background = isActive('/contact') ? '#7a0000' : '#8B0000'}
                         >
                             Contact
                         </Link>
