@@ -8,7 +8,7 @@ export const truckDataStructure = {
     stockNumber: "string",
     vinNumber: "string",
 
-    price: "number",
+    price: "string",
     isAvailable: "boolean",
     isFeatured: "boolean",
 

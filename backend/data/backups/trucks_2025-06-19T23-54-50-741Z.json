@@ -114,7 +114,7 @@
       "isActive": true
     },
     {
-      "id": "2004-custom-shitbox-1750377290741",
+      "id": "2004-custom-shitbox-1750377224518",
       "year": 2004,
       "make": "Custom",
       "model": "shitbox",
@@ -122,20 +122,11 @@
       "price": null,
       "isAvailable": true,
       "isFeatured": false,
-      "images": [
-        {
-          "url": "/uploads/trucks/2004-custom-shitbox-1750377224518/truck-image-1750377290716-462872497.jpg",
-          "caption": "m",
-          "isPrimary": true,
-          "filename": "truck-image-1750377290716-462872497.jpg",
-          "originalName": "modded-truck.jpg",
-          "size": 66042
-        }
-      ],
+      "images": [],
       "dateAdded": "2025-06-19T23:53:33.931Z",
-      "lastModified": "2025-06-19T23:54:50.741Z",
+      "lastModified": "2025-06-19T23:53:44.518Z",
       "isActive": true
     }
   ],
-  "lastUpdated": "2025-06-19T23:54:50.745Z"
+  "lastUpdated": "2025-06-19T23:53:44.522Z"
 }

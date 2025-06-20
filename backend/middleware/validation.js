@@ -58,7 +58,7 @@ const truckValidationRules = () => {
 
         body('price')
             .optional()
-            .isFloat({ min: 0 })
+            .isLength({ max: 50 })
             .withMessage('Price must be a positive number'),
 
         body('isAvailable')
@@ -201,7 +201,7 @@ const truckUpdateValidationRules = () => {
 
         body('price')
             .optional()
-            .isFloat({ min: 0 })
+            .isLength({ max: 50 })
             .withMessage('Price must be a positive number'),
 
         body('overview')

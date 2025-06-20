@@ -114,28 +114,53 @@
       "isActive": true
     },
     {
-      "id": "2004-custom-shitbox-1750377290741",
-      "year": 2004,
-      "make": "Custom",
-      "model": "shitbox",
+      "id": "2019-duplicate-truck-1750376186565",
+      "year": 2019,
+      "make": "duplicate",
+      "model": "truck",
       "condition": "New",
-      "price": null,
+      "price": 249999.9,
       "isAvailable": true,
       "isFeatured": false,
       "images": [
         {
-          "url": "/uploads/trucks/2004-custom-shitbox-1750377224518/truck-image-1750377290716-462872497.jpg",
-          "caption": "m",
+          "url": "/uploads/trucks/2019-duplicate-truck-1750376143752/truck-image-1750376186488-583773117.jpg",
+          "caption": "modded-truck",
           "isPrimary": true,
-          "filename": "truck-image-1750377290716-462872497.jpg",
+          "filename": "truck-image-1750376186488-583773117.jpg",
           "originalName": "modded-truck.jpg",
           "size": 66042
+        },
+        {
+          "url": "/uploads/trucks/2019-duplicate-truck-1750376143752/truck-image-1750376186489-681082615.jpg",
+          "caption": "20b23d7c99bac20c2b2ac3e5f7bc3366",
+          "isPrimary": false,
+          "filename": "truck-image-1750376186489-681082615.jpg",
+          "originalName": "20b23d7c99bac20c2b2ac3e5f7bc3366.jpg",
+          "size": 347648
+        },
+        {
+          "url": "/uploads/trucks/2019-duplicate-truck-1750376143752/truck-image-1750376186493-478674762.jpg",
+          "caption": "OIP",
+          "isPrimary": false,
+          "filename": "truck-image-1750376186493-478674762.jpg",
+          "originalName": "OIP.jpg",
+          "size": 23982
+        },
+        {
+          "url": "/uploads/trucks/2019-duplicate-truck-1750376143752/truck-image-1750376186493-231285334.jpg",
+          "caption": "OIF",
+          "isPrimary": false,
+          "filename": "truck-image-1750376186493-231285334.jpg",
+          "originalName": "OIF.jpg",
+          "size": 44882
         }
       ],
-      "dateAdded": "2025-06-19T23:53:33.931Z",
-      "lastModified": "2025-06-19T23:54:50.741Z",
-      "isActive": true
+      "dateAdded": "2025-06-19T23:35:43.752Z",
+      "lastModified": "2025-06-19T23:36:26.565Z",
+      "isActive": true,
+      "overview": "idk man, i found it"
     }
   ],
-  "lastUpdated": "2025-06-19T23:54:50.745Z"
+  "lastUpdated": "2025-06-19T23:36:26.570Z"
 }

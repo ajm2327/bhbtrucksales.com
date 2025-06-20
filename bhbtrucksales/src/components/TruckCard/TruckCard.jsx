@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { generateTruckSlug } from '../../data/trucks'
 
 const TruckCard = ({ truck, isFeatured = false }) => {
+    const [imageLoading, setImagesLoading] = useState(true)
+    const [imageError, setImageError] = useState(false)
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
+
     const primaryImage = truck.images.find(img => img.isPrimary) || truck.images[0]
     const formattedPrice = new Intl.NumberFormat('en-US', {
+
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 0,
@@ -28,20 +35,34 @@ const TruckCard = ({ truck, isFeatured = false }) => {
 
             {/* Image */}
             <div className="relative h-48 bg-gray-200">
-                {primaryImage ? (
-                    <img
-                        src={`http://localhost:3001${primaryImage.url}`}
-                        alt={`${truck.year} ${truck.make} ${truck.model}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.target.src = '/images/placeholder-truck.jpg'
-                        }}
-                    />
+                {primaryImage && !imageError ? (
+                    <>
+                        {imageLoading && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
+
+                            </div>
+                        )}
+                        <img
+                            src={`${backendUrl}${primaryImage.url}`}
+                            alt={`${truck.year} ${truck.make} ${truck.model}`}
+                            className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'
+                                }`}
+                            onLoad={() => setImagesLoading(false)}
+                            onError={() => {
+                                console.warn(`Failed to load image: ${backendUrl}${primaryImage.url}`)
+                                setImageError(true)
+                                setImagesLoading(false)
+                            }}
+                        />
+                    </>
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
                         <div className="text-gray-400 text-center">
                             <div className="text-4xl mb-2">🚛</div>
-                            <div className="text-sm">No Image Availabe</div>
+                            <div className="text-sm">
+                                {imageError ? 'Image not available' : 'No Image Available'}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -74,20 +95,20 @@ const TruckCard = ({ truck, isFeatured = false }) => {
                 {/* Key Specs */}
                 <div className="mb-4 space-y-2">
                     <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Engine</span>
-                        <span className="font-medium">{truck.engine}</span>
+                        <span className="text-gray-600">Engine:</span>
+                        <span className="font-medium">{truck.engine || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Transmission</span>
-                        <span className="font-medium">{truck.transmission}</span>
+                        <span className="text-gray-600">Transmission:</span>
+                        <span className="font-medium">{truck.transmission || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Drivetrain:</span>
-                        <span className="font-medium">{truck.drivetrain}</span>
+                        <span className="font-medium">{truck.drivetrain || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Stock #:</span>
-                        <span className="font-medium">{truck.stockNumber}</span>
+                        <span className="font-medium">{truck.stockNumber || 'N/A'}</span>
                     </div>
                 </div>
 
@@ -95,11 +116,11 @@ const TruckCard = ({ truck, isFeatured = false }) => {
                 <div className="mb-4 flex gap-4 text-sm">
                     <div>
                         <span className="text-gray-600">Exterior:</span>
-                        <span className="ml-1 font-medium">{truck.exteriorColor}</span>
+                        <span className="ml-1 font-medium">{truck.exteriorColor || 'N/A'}</span>
                     </div>
                     <div>
                         <span className="text-gray-600">Interior:</span>
-                        <span className="ml-1 font-medium">{truck.interiorColor}</span>
+                        <span className="ml-1 font-medium">{truck.interiorColor || 'N/A'}</span>
                     </div>
                 </div>
 

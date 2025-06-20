@@ -216,6 +216,21 @@ class FileManager {
             general: this.generalUploadsDir
         };
     }
+
+    /**
+     * Clean up temp upload directory
+     */
+    async cleanTempUploads() {
+        try {
+            const tempPath = path.join(this.trucksUploadsDir, 'temp');
+            if (await fs.pathExists(tempPath)) {
+                await fs.remove(tempPath);
+                console.log('Cleaned up temp upload directory');
+            }
+        } catch (error) {
+            console.error('Error cleaning temp uploads:', error);
+        }
+    }
 }
 
 module.exports = new FileManager();

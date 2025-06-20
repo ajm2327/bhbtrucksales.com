@@ -114,28 +114,19 @@
       "isActive": true
     },
     {
-      "id": "2004-custom-shitbox-1750377290741",
-      "year": 2004,
-      "make": "Custom",
-      "model": "shitbox",
+      "id": "2019-duplicate-truck-1750376143752",
+      "year": 2019,
+      "make": "duplicate",
+      "model": "truck",
       "condition": "New",
-      "price": null,
+      "price": 249999.9,
       "isAvailable": true,
       "isFeatured": false,
-      "images": [
-        {
-          "url": "/uploads/trucks/2004-custom-shitbox-1750377224518/truck-image-1750377290716-462872497.jpg",
-          "caption": "m",
-          "isPrimary": true,
-          "filename": "truck-image-1750377290716-462872497.jpg",
-          "originalName": "modded-truck.jpg",
-          "size": 66042
-        }
-      ],
-      "dateAdded": "2025-06-19T23:53:33.931Z",
-      "lastModified": "2025-06-19T23:54:50.741Z",
+      "images": [],
+      "dateAdded": "2025-06-19T23:35:43.752Z",
+      "lastModified": "2025-06-19T23:35:43.752Z",
       "isActive": true
     }
   ],
-  "lastUpdated": "2025-06-19T23:54:50.745Z"
+  "lastUpdated": "2025-06-19T23:35:43.758Z"
 }
