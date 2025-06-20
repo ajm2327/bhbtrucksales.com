@@ -86,7 +86,6 @@ const HomePage = () => {
             </Helmet>
 
             <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900">
-
                 {/* Announcement Banner */}
                 {siteSettings?.announcement?.isActive && !announcementDismissed && (
                     <div className="w-full bg-primary-600 text-white py-3 px-4 relative">
