@@ -62,7 +62,8 @@ export const truckDataStructure = {
 
     dateAdded: "Date",
     lastModified: "Date",
-    isActive: "boolean"
+    isActive: "boolean",
+    mileage: "string"
 }
 
 // Sample truck data based on your example

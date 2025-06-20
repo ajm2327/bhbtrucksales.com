@@ -58,19 +58,6 @@ const TruckCard = ({ truck }) => {
                     </div>
                 )}
 
-                {/* Condition Badge */}
-                {truck.condition && (
-                    <div className="absolute top-3 right-3">
-                        <span className={`px-3 py-1 rounded text-xs font-semibold ${truck.condition === 'New'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
-                            : truck.condition === 'Used'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                                : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
-                            }`}>
-                            {truck.condition}
-                        </span>
-                    </div>
-                )}
             </div>
 
             {/* Fixed Height Content Container */}
@@ -92,6 +79,12 @@ const TruckCard = ({ truck }) => {
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">Stock #:</span>
                                 <span className="font-medium text-gray-900 dark:text-gray-100 truncate ml-2">{truck.stockNumber}</span>
+                            </div>
+                        )}
+                        {truck.mileage && (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">Mileage:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 truncate ml-2">{new Intl.NumberFormat('en-US').format(truck.mileage)}</span>
                             </div>
                         )}
                         {truck.engine && (
