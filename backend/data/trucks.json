@@ -168,13 +168,13 @@
   ],
   "siteSettings": {
     "announcement": {
-      "isActive": false,
-      "title": "",
-      "message": "",
-      "createdAt": "2025-06-20T02:30:26.817Z"
+      "isActive": true,
+      "title": "Good morning!",
+      "message": "This is a test",
+      "createdAt": "2025-06-20T03:29:01.131Z"
     },
     "banner": {
-      "imageUrl": "",
+      "imageUrl": "/uploads/general/truck-image-1750390141114-768590648.jpg",
       "altText": "BHB Truck Sales"
     }
   },
@@ -191,5 +191,5 @@
       }
     ]
   },
-  "lastUpdated": "2025-06-20T02:30:26.841Z"
+  "lastUpdated": "2025-06-20T03:29:01.150Z"
 }
