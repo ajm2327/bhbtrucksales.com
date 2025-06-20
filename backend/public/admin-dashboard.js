@@ -534,6 +534,61 @@ document.getElementById('truckModal').addEventListener('click', (e) => {
     }
 });
 
+// Logo upload functions
+function triggerLogoUpload() {
+    document.getElementById('logoUpload').click();
+}
+
+function handleLogoDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) processLogoFile(files[0]);
+}
+
+function handleLogoUpload(e) {
+    const files = e.target.files;
+    if (files.length > 0) processLogoFile(files[0]);
+}
+
+function processLogoFile(file) {
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'].includes(file.type)) {
+        showNotification('Please select a valid image file', 'error');
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        showNotification('Logo too large (max 5MB)', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        window.logoImageData = { file: file, url: e.target.result };
+        renderLogoPreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+function renderLogoPreview() {
+    const preview = document.getElementById('logoPreview');
+    if (window.logoImageData) {
+        preview.innerHTML = `
+            <div style="position: relative; display: inline-block;">
+                <img src="${window.logoImageData.url}" alt="Logo preview" style="max-width: 100px; height: 100px; object-fit: contain; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
+                <button type="button" onclick="removeLogoImage()" style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px;">×</button>
+            </div>
+        `;
+    } else {
+        preview.innerHTML = '';
+    }
+}
+
+function removeLogo() {
+    window.logoImageData = null;
+    renderLogoPreview();
+}
+
 
 // Site Settings and About Page Management Functions
 function openSiteSettingsModal() {
@@ -555,6 +610,12 @@ function openSiteSettingsModal() {
     document.getElementById('announcementTitle').value = settings.announcement.title;
     document.getElementById('announcementMessage').value = settings.announcement.message;
     document.getElementById('bannerAltText').value = settings.banner.altText;
+
+    // Show current logo if exists
+    if (settings.logo && settings.logo.imageUrl) {
+        window.logoImageData = { url: settings.logo.imageUrl, existing: true };
+        renderLogoPreview();
+    }
 
     document.getElementById('truckModal').classList.add('show');
 }
@@ -705,8 +766,29 @@ function changeAboutSectionType(index, newType) {
 
 async function saveSiteSettings() {
     try {
-        let bannerImageUrl = '';
+        let logoImageUrl = window.siteSettings.logo?.imageUrl || '';
 
+        // Upload logo image if there's a new one
+        if (window.logoImageData && window.logoImageData.file) {
+            const formData = new FormData();
+            formData.append('images', window.logoImageData.file);
+
+            const uploadResponse = await fetch('/api/uploads/general', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (uploadResult.success) {
+                logoImageUrl = uploadResult.data.files[0].url;
+            } else {
+                showNotification('Failed to upload logo image', 'error');
+                return;
+            }
+        }
+
+        let bannerImageUrl = '';
         // Upload banner image if there's one
         if (window.bannerImageData && window.bannerImageData.file) {
             const formData = new FormData();
@@ -737,6 +819,10 @@ async function saveSiteSettings() {
             banner: {
                 imageUrl: bannerImageUrl || window.siteSettings.banner.imageUrl,
                 altText: document.getElementById('bannerAltText').value
+            },
+            logo: {
+                imageUrl: logoImageUrl,
+                altText: "BHB Truck Sales Logo"
             }
         };
 
@@ -750,6 +836,7 @@ async function saveSiteSettings() {
         const result = await response.json();
         if (result.success) {
             window.siteSettings = settingsData;
+            window.logoImageData = null;
             window.bannerImageData = null;
             showNotification('Site settings updated successfully!', 'success');
             closeModal();

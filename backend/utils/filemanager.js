@@ -187,6 +187,10 @@ class FileManager {
                 banner: {
                     imageUrl: "",
                     altText: "BHB Truck Sales"
+                },
+                logo: {
+                    imageUrl: "",
+                    altText: "BHB Truck Sales Logo"
                 }
             };
         } catch (error) {

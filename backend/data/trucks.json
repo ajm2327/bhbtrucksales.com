@@ -171,11 +171,15 @@
       "isActive": true,
       "title": "Good morning!",
       "message": "This is a test",
-      "createdAt": "2025-06-20T03:29:01.131Z"
+      "createdAt": "2025-06-20T17:33:59.504Z"
     },
     "banner": {
-      "imageUrl": "/uploads/general/truck-image-1750390141114-768590648.jpg",
+      "imageUrl": "/uploads/general/truck-image-1750440839577-641553472.jpg",
       "altText": "BHB Truck Sales"
+    },
+    "logo": {
+      "imageUrl": "",
+      "altText": "BHB Truck Sales Logo"
     }
   },
   "aboutPage": {
@@ -191,5 +195,5 @@
       }
     ]
   },
-  "lastUpdated": "2025-06-20T03:29:01.150Z"
+  "lastUpdated": "2025-06-20T17:33:59.611Z"
 }

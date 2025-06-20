@@ -671,6 +671,20 @@ router.get('/', requireAuth, async (req, res) => {
                             <textarea id="announcementMessage" placeholder="Announcement message..." style="margin-top: 0.5rem;"></textarea>
                         </div>
 
+                        <!-- Logo Management -->
+                        <div class="form-group">
+                            <label>Company Logo</label>
+                            <div class="image-upload" onclick="triggerLogoUpload()" ondrop="handleLogoDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                <div style="pointer-events: none;">
+                                    <div style="font-size: 2rem; margin-bottom: 1rem;">🏢</div>
+                                    <p><strong>Click to upload company logo</strong></p>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Recommended: Square format (PNG, SVG preferred)</p>
+                                </div>
+                                <input type="file" id="logoUpload" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                            </div>
+                            <div id="logoPreview" style="margin-top: 1rem;"></div>
+                        </div>
+
                         <!-- Banner Management -->
                         <div class="form-group">
                             <label>Hero Banner Image</label>
