@@ -2,26 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
 }
 
-/* Light mode (default) */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
+  width: 100%;
   min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
   background-color: #ffffff;
   color: #1a1a1a;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
 }
 
 /* Dark mode */
@@ -30,10 +31,15 @@ body {
   color: #f5f5f5;
 }
 
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Link styles */
 a {
-  font-weight: 500;
   color: #8B0000;
-  text-decoration: inherit;
+  text-decoration: none;
   transition: color 0.3s ease;
 }
 
@@ -49,17 +55,10 @@ a:hover {
   color: #f56565;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
+/* Button base styles */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
   background-color: #8B0000;
   color: white;
@@ -69,12 +68,12 @@ button {
 
 button:hover {
   background-color: #a30000;
-  transform: translateY(-1px);
 }
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid #8B0000;
+  outline-offset: 2px;
 }
 
 .dark button {
@@ -85,64 +84,68 @@ button:focus-visible {
   background-color: #f56565;
 }
 
-/* Custom scrollbar for horizontal scroll */
-.horizontal-scroll::-webkit-scrollbar {
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
   height: 8px;
 }
 
-.horizontal-scroll::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 4px;
 }
 
-.dark .horizontal-scroll::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: #2d3748;
 }
 
-.horizontal-scroll::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #8B0000;
   border-radius: 4px;
 }
 
-.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #a30000;
 }
 
-.dark .horizontal-scroll::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #dc4444;
 }
 
-.dark .horizontal-scroll::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #f56565;
 }
 
-/* Truck Card Fixed Dimensions */
-.truck-card-container {
-  height: 420px !important;
-  overflow: hidden !important;
-  display: flex;
-  flex-direction: column;
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
-.truck-card-image {
-  height: 200px !important;
-  min-height: 200px !important;
-  max-height: 200px !important;
-  overflow: hidden !important;
-  position: relative;
-  flex-shrink: 0;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-.truck-card-image img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
+/* Ensure full width containers */
+.full-width {
+  width: 100vw;
+  max-width: none !important;
 }
 
-/* Ensure grid items maintain height */
-.truck-grid-item {
-  height: 420px !important;
+/* Smooth animations */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
