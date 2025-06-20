@@ -115,3 +115,34 @@ button:focus-visible {
 .dark .horizontal-scroll::-webkit-scrollbar-thumb:hover {
   background: #f56565;
 }
+
+/* Truck Card Fixed Dimensions */
+.truck-card-container {
+  height: 420px !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.truck-card-image {
+  height: 200px !important;
+  min-height: 200px !important;
+  max-height: 200px !important;
+  overflow: hidden !important;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.truck-card-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Ensure grid items maintain height */
+.truck-grid-item {
+  height: 420px !important;
+}

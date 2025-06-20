@@ -2,39 +2,33 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { generateTruckSlug } from '../../data/trucks'
 
-const TruckCard = ({ truck, isFeatured = false }) => {
-    const [imageLoading, setImagesLoading] = useState(true)
+const TruckCard = ({ truck }) => {
+    const [imageLoading, setImageLoading] = useState(true)
     const [imageError, setImageError] = useState(false)
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
 
-    const primaryImage = truck.images.find(img => img.isPrimary) || truck.images[0]
-    const formattedPrice = new Intl.NumberFormat('en-US', {
-
+    const primaryImage = truck.images?.find(img => img.isPrimary) || truck.images?.[0]
+    const formattedPrice = truck.price ? new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-    }).format(truck.price)
-
-    const cardClasses = `
-        bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:scale-102
-        ${isFeatured ? 'ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-gray-900' : ''}
-    `
+    }).format(truck.price) : 'Contact for Price'
 
     return (
-        <div className={cardClasses}>
-            {/* Featured Badge */}
-            {isFeatured && (
-                <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+        <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden w-full" style={{ height: '420px', maxWidth: '400px' }}>
+            {/* Featured Badge - Fixed positioning and padding */}
+            {truck.isFeatured && (
+                <div className="absolute top-3 left-3 z-10">
+                    <span className="bg-primary-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg inline-block">
                         Featured
                     </span>
                 </div>
             )}
 
-            {/* Image */}
-            <div className="relative h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            {/* Fixed Height Image Container */}
+            <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-700" style={{ height: '200px' }}>
                 {primaryImage && !imageError ? (
                     <>
                         {imageLoading && (
@@ -45,35 +39,33 @@ const TruckCard = ({ truck, isFeatured = false }) => {
                         <img
                             src={`${backendUrl}${primaryImage.url}`}
                             alt={`${truck.year} ${truck.make} ${truck.model}`}
-                            className={`w-full h-full object-cover object-center transition-all duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'
-                                } ${isFeatured ? 'hover:scale-105' : 'hover:scale-102'}`}
-                            onLoad={() => setImagesLoading(false)}
+                            className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'
+                                } hover:scale-105`}
+                            style={{ objectFit: 'cover', width: '100%', height: '200px' }}
+                            onLoad={() => setImageLoading(false)}
                             onError={() => {
-                                console.warn(`Failed to load image: ${backendUrl}${primaryImage.url}`)
                                 setImageError(true)
-                                setImagesLoading(false)
+                                setImageLoading(false)
                             }}
                         />
                     </>
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
                         <div className="text-gray-400 dark:text-gray-600 text-center">
-                            <div className="text-4xl mb-2">🚛</div>
-                            <div className="text-sm">
-                                {imageError ? 'Image not available' : 'No Image Available'}
-                            </div>
+                            <div className="text-5xl mb-2">🚛</div>
+                            <div className="text-sm font-medium">No Image Available</div>
                         </div>
                     </div>
                 )}
 
-                {/* Condition badge */}
+                {/* Condition Badge */}
                 {truck.condition && (
-                    <div className="absolute top-4 right-4">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${truck.condition === 'New'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
-                            : truck.condition === 'Used'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                                : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+                    <div className="absolute top-3 right-3">
+                        <span className={`px-3 py-1 rounded text-xs font-semibold ${truck.condition === 'New'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                                : truck.condition === 'Used'
+                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
                             }`}>
                             {truck.condition}
                         </span>
@@ -81,77 +73,56 @@ const TruckCard = ({ truck, isFeatured = false }) => {
                 )}
             </div>
 
-            {/* Card Content */}
-            <div className="p-6 bg-white dark:bg-gray-800 transition-colors duration-300">
-                {/* Title and price */}
-                <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+            {/* Fixed Height Content Container */}
+            <div className="p-4 flex flex-col" style={{ height: '220px' }}>
+                {/* Title and Price */}
+                <div className="mb-3">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 truncate">
                         {truck.year} {truck.make} {truck.model}
                     </h3>
-                    {truck.price && (
-                        <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                            {formattedPrice}
-                        </p>
-                    )}
+                    <p className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                        {formattedPrice}
+                    </p>
                 </div>
 
-                {/* Key Specs - Only show fields that have values */}
-                <div className="mb-4 space-y-2">
-                    {truck.engine && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">Engine:</span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{truck.engine}</span>
-                        </div>
-                    )}
-                    {truck.transmission && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">Transmission:</span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{truck.transmission}</span>
-                        </div>
-                    )}
-                    {truck.drivetrain && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">Drivetrain:</span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{truck.drivetrain}</span>
-                        </div>
-                    )}
-                    {truck.stockNumber && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">Stock #:</span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{truck.stockNumber}</span>
-                        </div>
-                    )}
-                </div>
-
-                {/* Colors - Only show if at least one color is available */}
-                {(truck.exteriorColor || truck.interiorColor) && (
-                    <div className="mb-4 flex gap-4 text-sm">
-                        {truck.exteriorColor && (
-                            <div>
-                                <span className="text-gray-600 dark:text-gray-400">Exterior:</span>
-                                <span className="ml-1 font-medium text-gray-900 dark:text-gray-100">{truck.exteriorColor}</span>
+                {/* Key Specs - Fixed area */}
+                <div className="flex-grow mb-3 overflow-hidden">
+                    <div className="space-y-1">
+                        {truck.stockNumber && (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">Stock #:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 truncate ml-2">{truck.stockNumber}</span>
                             </div>
                         )}
-                        {truck.interiorColor && (
-                            <div>
-                                <span className="text-gray-600 dark:text-gray-400">Interior:</span>
-                                <span className="ml-1 font-medium text-gray-900 dark:text-gray-100">{truck.interiorColor}</span>
+                        {truck.engine && (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">Engine:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 truncate ml-2" style={{ maxWidth: '60%' }}>{truck.engine}</span>
+                            </div>
+                        )}
+                        {truck.transmission && (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">Trans:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 truncate ml-2" style={{ maxWidth: '60%' }}>{truck.transmission}</span>
                             </div>
                         )}
                     </div>
-                )}
+                </div>
 
-                {/* Action Buttons */}
+                {/* Action Buttons - Fixed at bottom */}
                 <div className="flex gap-2">
                     <Link
-                        to={`/truck/${generateTruckSlug(truck)}`}
-                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white text-center py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 font-medium"
+                        to={`/truck/${truck.id}`}
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white text-center py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 font-medium text-sm"
                     >
                         View Details
                     </Link>
-                    <button className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg transition-all duration-200 font-medium">
+                    <Link
+                        to="/contact"
+                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg transition-all duration-200 font-medium text-sm"
+                    >
                         Contact
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>

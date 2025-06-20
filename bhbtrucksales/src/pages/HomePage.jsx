@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import TruckCard from '../components/TruckCard/TruckCard'
-
 
 const HomePage = () => {
     const [trucks, setTrucks] = useState([])
@@ -11,6 +10,10 @@ const HomePage = () => {
     const [announcementDismissed, setAnnouncementDismissed] = useState(() => {
         return localStorage.getItem('announcementDismissed') === 'true'
     })
+
+    const featuredScrollRef = useRef(null)
+    const [showLeftArrow, setShowLeftArrow] = useState(false)
+    const [showRightArrow, setShowRightArrow] = useState(true)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,11 +51,45 @@ const HomePage = () => {
 
     const featuredTrucks = loading ? [] : trucks.filter(truck => truck.isFeatured)
     const regularTrucks = loading ? [] : trucks.filter(truck => !truck.isFeatured)
+
     const dismissAnnouncement = () => {
         setAnnouncementDismissed(true)
         localStorage.setItem('announcementDismissed', 'true')
     }
 
+    const scrollFeatured = (direction) => {
+        const container = featuredScrollRef.current
+        if (!container) return
+
+        const scrollAmount = 380 // Width of one card plus gap
+        const newScrollPosition = direction === 'left'
+            ? container.scrollLeft - scrollAmount
+            : container.scrollLeft + scrollAmount
+
+        container.scrollTo({
+            left: newScrollPosition,
+            behavior: 'smooth'
+        })
+    }
+
+    const checkScrollButtons = () => {
+        const container = featuredScrollRef.current
+        if (!container) return
+
+        setShowLeftArrow(container.scrollLeft > 0)
+        setShowRightArrow(
+            container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+        )
+    }
+
+    useEffect(() => {
+        const container = featuredScrollRef.current
+        if (container) {
+            container.addEventListener('scroll', checkScrollButtons)
+            checkScrollButtons() // Initial check
+            return () => container.removeEventListener('scroll', checkScrollButtons)
+        }
+    }, [featuredTrucks])
 
     return (
         <>
@@ -113,12 +150,12 @@ const HomePage = () => {
                                 </span>
                             </div>
                             <div className="flex gap-4">
-                                <button className="bg-white text-primary-800 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                <a href="#inventory" className="bg-white text-primary-800 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
                                     Browse Inventory
-                                </button>
-                                <button className="bg-primary-600 hover:bg-primary-700 font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                </a>
+                                <a href="/contact" className="bg-primary-600 hover:bg-primary-700 font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
                                     Contact Us
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -164,60 +201,98 @@ const HomePage = () => {
 
                 {/* Main Content */}
                 {!loading && !error && (
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div id="inventory" className="py-12">
                         {/* Featured Trucks Section */}
                         {featuredTrucks.length > 0 && (
                             <section className="mb-16">
-                                <div className="text-center mb-8">
-                                    <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                        Featured Inventory
-                                    </h2>
-                                    <p className="text-lg text-gray-600 dark:text-gray-400">
-                                        Our hand-picked premium vehicles
-                                    </p>
-                                </div>
-
-                                {/* Horizontal Scroll Container */}
-                                <div className="relative">
-                                    <div className="flex gap-6 overflow-x-auto pb-4 horizontal-scroll snap-x snap-mandatory">
-                                        {featuredTrucks.map(truck => (
-                                            <div key={truck.id} className="flex-shrink-0 w-80 snap-center">
-                                                <TruckCard truck={truck} isFeatured={true} />
-                                            </div>
-                                        ))}
+                                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                    <div className="text-center mb-8">
+                                        <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                            Featured Inventory
+                                        </h2>
+                                        <p className="text-lg text-gray-600 dark:text-gray-400">
+                                            Our hand-picked premium vehicles
+                                        </p>
                                     </div>
 
-                                    {/* Scroll Indicator */}
-                                    {featuredTrucks.length > 3 && (
-                                        <div className="text-center mt-4">
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                ← Scroll to see more featured trucks →
-                                            </p>
+                                    {/* Featured Trucks Horizontal Scroll */}
+                                    <div className="relative">
+                                        {/* Left Arrow */}
+                                        {featuredTrucks.length > 3 && showLeftArrow && (
+                                            <button
+                                                onClick={() => scrollFeatured('left')}
+                                                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-gray-800 shadow-lg rounded-full p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                                                aria-label="Scroll left"
+                                            >
+                                                <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                                </svg>
+                                            </button>
+                                        )}
+
+                                        {/* Scrollable Container with proper spacing */}
+                                        <div
+                                            ref={featuredScrollRef}
+                                            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-2"
+                                            style={{
+                                                scrollbarWidth: 'none',
+                                                msOverflowStyle: 'none',
+                                                WebkitScrollbar: { display: 'none' }
+                                            }}
+                                        >
+                                            {featuredTrucks.map(truck => (
+                                                <div key={truck.id} className="flex-shrink-0 snap-center" style={{ width: '350px' }}>
+                                                    <TruckCard truck={truck} />
+                                                </div>
+                                            ))}
                                         </div>
-                                    )}
+
+                                        {/* Right Arrow */}
+                                        {featuredTrucks.length > 3 && showRightArrow && (
+                                            <button
+                                                onClick={() => scrollFeatured('right')}
+                                                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-gray-800 shadow-lg rounded-full p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                                                aria-label="Scroll right"
+                                            >
+                                                <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </section>
                         )}
 
-                        {/* All Trucks Section */}
-                        <section>
-                            <div className="text-center mb-8">
-                                <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                    {featuredTrucks.length > 0 ? 'Complete Inventory' : 'Available Trucks'}
-                                </h2>
-                                <p className="text-lg text-gray-600 dark:text-gray-400">
-                                    Browse our full selection of quality commercial vehicles
-                                </p>
-                            </div>
+                        {/* All Trucks Grid Section */}
+                        {regularTrucks.length > 0 && (
+                            <section>
+                                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                    <div className="text-center mb-8">
+                                        <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                            {featuredTrucks.length > 0 ? 'Complete Inventory' : 'Available Trucks'}
+                                        </h2>
+                                        <p className="text-lg text-gray-600 dark:text-gray-400">
+                                            Browse our full selection of quality commercial vehicles
+                                        </p>
+                                    </div>
 
-                            {trucks.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    {regularTrucks.map(truck => (
-                                        <TruckCard key={truck.id} truck={truck} />
-                                    ))}
+                                    {/* Fixed Grid Layout */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+                                        {regularTrucks.map(truck => (
+                                            <div key={truck.id} className="w-full max-w-[400px]">
+                                                <TruckCard truck={truck} />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="text-center py-16">
+                            </section>
+                        )}
+
+                        {/* Empty State */}
+                        {trucks.length === 0 && (
+                            <section className="py-16">
+                                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                                     <div className="text-gray-400 dark:text-gray-600 text-8xl mb-6">🚛</div>
                                     <h3 className="text-2xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
                                         No Trucks Available
@@ -226,11 +301,24 @@ const HomePage = () => {
                                         Check back later for new inventory or contact us for upcoming arrivals.
                                     </p>
                                 </div>
-                            )}
-                        </section>
+                            </section>
+                        )}
                     </div>
                 )}
             </div>
+
+            <style jsx>{`
+                /* Hide scrollbar for Chrome, Safari and Opera */
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                
+                /* Hide scrollbar for IE, Edge and Firefox */
+                .scrollbar-hide {
+                    -ms-overflow-style: none;  /* IE and Edge */
+                    scrollbar-width: none;  /* Firefox */
+                }
+            `}</style>
         </>
     )
 }
