@@ -15,7 +15,9 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/data /app/uploads/trucks /app/uploads/general /app/data/backups
 
-COPY uploads /app/uploads-seed
+RUN if [ -d "uploads" ]; then cp -r uploads/* /app/uploads/ 2>/dev/null || true; fi
+RUN if [ -d "data" ]; then cp -r data/* /app/data/ 2>/dev/null || true; fi
+
 
 
 # Expose port

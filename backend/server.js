@@ -34,7 +34,7 @@ app.use(helmet({
             scriptSrc: ["'self'", "'unsafe-inline'"],
             scriptSrcAttr: ["'unsafe-inline'"],
             objectSrc: ["'none'"],
-            upgradeInsecureRequests: []
+            upgradeInsecureRequests: null
         }
     }
 }));

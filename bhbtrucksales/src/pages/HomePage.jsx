@@ -69,8 +69,9 @@ const HomePage = () => {
     }
 
     // Create background image URL
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
     const backgroundImageUrl = siteSettings?.banner?.imageUrl
-        ? `http://localhost:3001${siteSettings.banner.imageUrl}`
+        ? `${backendUrl}${siteSettings.banner.imageUrl}`
         : null
 
     return (

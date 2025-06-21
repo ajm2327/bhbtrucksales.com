@@ -6,7 +6,7 @@ const TruckCard = ({ truck }) => {
     const [imageLoading, setImageLoading] = useState(true)
     const [imageError, setImageError] = useState(false)
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
 
     const primaryImage = truck.images?.find(img => img.isPrimary) || truck.images?.[0]
     const formattedPrice = truck.price ? new Intl.NumberFormat('en-US', {
