@@ -38,7 +38,7 @@ const Header = () => {
                         <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
                             {logoUrl ? (
                                 <img
-                                    src={`http://localhost:3001${logoUrl}`}
+                                    src={logoUrl ? `${logoUrl}` : ''}
                                     alt="BHB Truck Sales Logo"
                                     className="w-8 h-8 object-contain rounded"
                                 />
