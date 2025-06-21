@@ -11,7 +11,8 @@ const Header = () => {
     useEffect(() => {
         const fetchSiteSettings = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/trucks/site-settings')
+                const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
+                const response = await fetch(`${backendUrl}/api/trucks/site-settings`)
                 const data = await response.json()
                 if (data.success) {
                     setSiteSettings(data.data)

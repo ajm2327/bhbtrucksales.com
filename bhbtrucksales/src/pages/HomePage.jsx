@@ -16,9 +16,10 @@ const HomePage = () => {
                 setLoading(true)
                 setError(null)
 
+                const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
                 const [trucksResponse, settingsResponse] = await Promise.all([
-                    fetch('http://localhost:3001/api/trucks?available=true'),
-                    fetch('http://localhost:3001/api/trucks/site-settings')
+                    fetch(`${backendUrl}/api/trucks?available=true`),
+                    fetch(`${backendUrl}/api/trucks/site-settings`)
                 ])
 
                 if (trucksResponse.ok) {

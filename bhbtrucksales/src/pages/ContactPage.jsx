@@ -17,7 +17,7 @@ const ContactPage = () => {
     const [submitted, setSubmitted] = useState(false)
     const [error, setError] = useState('')
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
 
     useEffect(() => {
         const fetchTrucks = async () => {

@@ -42,8 +42,8 @@ app.use(helmet({
 // CORS config
 const corsOptions = {
     origin: isDevelopment
-        ? ['http://localhost:5173', 'http://localhost:3000']
-        : process.env.CORS_ORIGIN?.split(',') || ['https://bhbtrucksales.com'],
+        ? ['http://localhost:5173', 'http://localhost:3000', 'http://localhost']
+        : process.env.CORS_ORIGIN?.split(',') || ['http://localhost'],
     credentials: true,
     optionsSuccessStatus: 200
 };

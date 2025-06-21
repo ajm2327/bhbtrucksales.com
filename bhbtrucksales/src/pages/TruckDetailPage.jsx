@@ -10,7 +10,7 @@ const TruckDetailPage = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
     const [imageLoading, setImageLoading] = useState(true)
 
-    const backendUrl = 'http://localhost:3001'
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
 
     useEffect(() => {
         const fetchTruck = async () => {
@@ -147,8 +147,8 @@ const TruckDetailPage = () => {
                     {/* Status Badge */}
                     <div className="flex items-center space-x-2">
                         <span className={`px-3 py-1 rounded-full text-sm font-semibold ${truck.isAvailable
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
                             }`}>
                             {truck.isAvailable ? 'Available' : 'Sold'}
                         </span>
@@ -232,8 +232,8 @@ const TruckDetailPage = () => {
                                             setImageLoading(true)
                                         }}
                                         className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${index === selectedImageIndex
-                                                ? 'border-primary-600'
-                                                : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
+                                            ? 'border-primary-600'
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
                                             }`}
                                     >
                                         <img

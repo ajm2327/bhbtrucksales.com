@@ -6,7 +6,7 @@ const AboutPage = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
 
     useEffect(() => {
         const fetchAboutData = async () => {
