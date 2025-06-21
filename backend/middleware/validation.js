@@ -35,7 +35,7 @@ const truckValidationRules = () => {
         body('stockNumber')
             .optional()
             .trim()
-            .isLength({ min: 1, max: 50 })
+            .isLength({ max: 50 })
             .withMessage('Stock number is required'),
 
         body('modelCode')
@@ -183,7 +183,7 @@ const truckUpdateValidationRules = () => {
         body('stockNumber')
             .optional()
             .trim()
-            .isLength({ min: 1, max: 50 })
+            .isLength({ max: 50 })
             .withMessage('Stock number must be less than 50 characters'),
 
         // All other fields same as create validation but optional
@@ -203,6 +203,11 @@ const truckUpdateValidationRules = () => {
             .optional()
             .isLength({ max: 50 })
             .withMessage('Price must be a positive number'),
+
+        body('mileage')
+            .optional()
+            .isLength({ max: 50 })
+            .withMessage('Miles must be positive number'),
 
         body('overview')
             .optional()

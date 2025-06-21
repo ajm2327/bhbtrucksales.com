@@ -13,6 +13,7 @@ const truckRoutes = require('./routes/trucks');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/uploads');
+const contactRoutes = require('./routes/contact');
 
 //initialize express app
 const app = express();
@@ -78,6 +79,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
+
 //health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
@@ -95,6 +97,8 @@ app.use('/', authRoutes); // for login page
 app.use('/admin', adminRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/trucks', truckRoutes);
+app.use('/api/contact', contactRoutes);
+
 
 //API documentation endpoint
 app.get('/api', (req, res) => {

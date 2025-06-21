@@ -542,6 +542,7 @@ router.get('/', requireAuth, async (req, res) => {
                         <th>Make/Model</th>
                         <th>Stock #</th>
                         <th>Price</th>
+                        <th>Mileage</th>
                         <th>Condition</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -580,11 +581,7 @@ router.get('/', requireAuth, async (req, res) => {
                             </div>
                             <div class="form-group">
                                 <label for="condition">Condition</label>
-                                <select id="condition" name="condition">
-                                    <option value="New">New</option>
-                                    <option value="Used">Used</option>
-                                    <option value="Certified">Certified</option>
-                                </select>
+                                <input type="text" id="condition" name="condition" placeholder="e.g. New, Used, Certified, or leave blank">
                             </div>
                             <div class="form-group">
                                 <label for="stockNumber">Stock Number</label>
@@ -597,6 +594,10 @@ router.get('/', requireAuth, async (req, res) => {
                             <div class="form-group">
                                 <label for="price">Price</label>
                                 <input type="number" id="price" name="price">
+                            </div>
+                            <div class="form-group">
+                                <label for "mileage">Mileage</label>
+                                <input type="number" id="mileage" name="mileage">
                             </div>
                             <div class="form-group">
                                 <label for="engine">Engine</label>

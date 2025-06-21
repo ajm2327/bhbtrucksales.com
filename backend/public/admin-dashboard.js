@@ -156,7 +156,8 @@ function renderTrucksTable() {
                 </td>
                 <td>${truck.stockNumber || 'N/A'}</td>
                 <td class="price-cell">${formattedPrice}</td>
-                <td><span class="status-badge status-${(truck.condition || 'used').toLowerCase()}">${truck.condition || 'Used'}</span></td>
+                <td>${truck.mileage ? new Intl.NumberFormat('en-US').format(truck.mileage) + 'mi' : 'N/A'}</td>
+                <td><span class="status-badge status-${truck.condition ? truck.condition.toLowerCase() : 'N/A'}">${truck.condition || 'N/A'}</span></td>
                 <td>
                     <span class="status-badge status-${truck.isAvailable ? 'available' : 'unavailable'}">
                         ${truck.isAvailable ? 'Available' : 'Unavailable'}
@@ -475,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     truckData[key] = value.trim() || null;
                 } else {
                     // Don't send empty strings, send undefined instead
-                    truckData[key] = value.trim() || undefined;
+                    truckData[key] = value.trim() || (editingTruckId ? null : undefined);
                 }
             }
 
@@ -859,22 +860,58 @@ async function saveAboutPage() {
 
         // Get all content sections
         const sections = document.querySelectorAll('.about-section');
-        sections.forEach((section, index) => {
+
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
             const type = section.querySelector('select').value;
+
             if (type === 'paragraph') {
                 const text = section.querySelector('textarea').value;
                 if (text.trim()) {
                     aboutData.content.push({ type: 'paragraph', text: text.trim() });
                 }
-            } else {
+            } else if (type === 'image') {
                 const inputs = section.querySelectorAll('input');
-                const url = inputs[0].value.trim();
-                const caption = inputs[1].value.trim();
-                if (url) {
-                    aboutData.content.push({ type: 'image', url, caption });
+                const urlInput = inputs[0]; // URL input
+                const captionInput = inputs[1]; // Caption input
+
+                let imageUrl = urlInput.value.trim();
+
+                // Check if there's a new image to upload for this section
+                if (window.aboutImages && window.aboutImages[i]) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('images', window.aboutImages[i].file);
+
+                        const uploadResponse = await fetch('/api/uploads/general', {
+                            method: 'POST',
+                            credentials: 'include',
+                            body: formData
+                        });
+
+                        const uploadResult = await uploadResponse.json();
+                        if (uploadResult.success) {
+                            imageUrl = uploadResult.data.files[0].url;
+                        } else {
+                            showNotification('Failed to upload image', 'error');
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Image upload error:', error);
+                        showNotification('Failed to upload image', 'error');
+                        return;
+                    }
+                }
+
+                if (imageUrl) {
+                    aboutData.content.push({
+                        type: 'image',
+                        url: imageUrl,
+                        caption: captionInput.value.trim() || ''
+                    });
                 }
             }
-        });
+        }
 
         const response = await fetch('/api/trucks/about-page', {
             method: 'PUT',
@@ -886,6 +923,7 @@ async function saveAboutPage() {
         const result = await response.json();
         if (result.success) {
             window.aboutPage = aboutData;
+            window.aboutImages = {}; // Clear uploaded images
             showNotification('About page updated successfully!', 'success');
             closeModal();
         } else {

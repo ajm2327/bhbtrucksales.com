@@ -5,10 +5,10 @@
       "year": 2025,
       "make": "WESTERN STAR test truck",
       "model": "49X",
-      "condition": "New",
+      "condition": "Hippo",
       "stockNumber": "WC2899",
       "vinNumber": "5KJJBWDR3SPWC2899",
-      "price": 185000,
+      "price": "185000",
       "isAvailable": true,
       "isFeatured": true,
       "images": [
@@ -18,7 +18,44 @@
           "isPrimary": true,
           "filename": "truck-image-1750359904576-255527361.jpg",
           "originalName": "OIF.jpg",
-          "size": 44882
+          "size": 44882,
+          "existing": true
+        },
+        {
+          "url": "/uploads/trucks/2025-western-star-test-truck-49x-wc2899/truck-image-1750456739202-12674116.jpg",
+          "caption": "modded-truck",
+          "isPrimary": true,
+          "filename": "truck-image-1750456739202-12674116.jpg",
+          "originalName": "modded-truck.jpg",
+          "size": 66042,
+          "existing": true
+        },
+        {
+          "url": "/uploads/trucks/2025-western-star-test-truck-49x-wc2899/truck-image-1750456739202-879458068.jpg",
+          "caption": "OIP",
+          "isPrimary": false,
+          "filename": "truck-image-1750456739202-879458068.jpg",
+          "originalName": "OIP.jpg",
+          "size": 23982,
+          "existing": true
+        },
+        {
+          "url": "/uploads/trucks/2025-western-star-test-truck-49x-wc2899/truck-image-1750456739203-126256080.jpg",
+          "caption": "20b23d7c99bac20c2b2ac3e5f7bc3366",
+          "isPrimary": false,
+          "filename": "truck-image-1750456739203-126256080.jpg",
+          "originalName": "20b23d7c99bac20c2b2ac3e5f7bc3366.jpg",
+          "size": 347648,
+          "existing": true
+        },
+        {
+          "url": "/uploads/trucks/2025-western-star-test-truck-49x-wc2899/truck-image-1750456739207-786125425.jpg",
+          "caption": "OIF",
+          "isPrimary": false,
+          "filename": "truck-image-1750456739207-786125425.jpg",
+          "originalName": "OIF.jpg",
+          "size": 44882,
+          "existing": true
         }
       ],
       "engine": "Detroit DD15 505HP",
@@ -55,8 +92,9 @@
         }
       },
       "dateAdded": "2025-06-18T00:00:00Z",
-      "lastModified": "2025-06-19T19:05:04.651Z",
-      "isActive": true
+      "lastModified": "2025-06-20T22:05:51.892Z",
+      "isActive": true,
+      "mileage": "300000"
     },
     {
       "id": "2025-autobot-optimus-prime-1750363918060",
@@ -87,12 +125,12 @@
       "isActive": true
     },
     {
-      "id": "2009-semi-truck-the-one-from-cars-1750364047106",
+      "id": "2009-semi-truck-the-one-from-cars-1750459702419",
       "year": 2009,
       "make": "Semi Truck",
       "model": "The one from cars",
-      "condition": "Used",
-      "price": 50000,
+      "condition": "Certified",
+      "price": "50000",
       "transmission": "Manual",
       "exteriorColor": "Red",
       "interiorColor": "Red",
@@ -106,79 +144,56 @@
           "isPrimary": true,
           "filename": "truck-image-1750364047080-834189863.jpg",
           "originalName": "20b23d7c99bac20c2b2ac3e5f7bc3366.jpg",
-          "size": 347648
+          "size": 347648,
+          "existing": true
         }
       ],
       "dateAdded": "2025-06-19T20:14:07.106Z",
-      "lastModified": "2025-06-19T20:14:07.106Z",
-      "isActive": true
+      "lastModified": "2025-06-20T22:48:22.419Z",
+      "isActive": true,
+      "stockNumber": "",
+      "vinNumber": null,
+      "mileage": null,
+      "engine": null,
+      "drivetrain": null
     },
     {
-      "id": "2004-custom-shitbox-1750377290741",
+      "id": "2004-chevy-shitbox-1750455119610",
       "year": 2004,
-      "make": "Custom",
-      "model": "shitbox",
-      "condition": "New",
+      "make": "Chevy",
+      "model": "Shitbox",
       "price": null,
+      "mileage": "400",
       "isAvailable": true,
       "isFeatured": false,
       "images": [
         {
-          "url": "/uploads/trucks/2004-custom-shitbox-1750377224518/truck-image-1750377290716-462872497.jpg",
+          "url": "/uploads/trucks/2004-chevy-shitbox-1750455119568/truck-image-1750455119597-98923393.jpg",
           "caption": "m",
           "isPrimary": true,
-          "filename": "truck-image-1750377290716-462872497.jpg",
+          "filename": "truck-image-1750455119597-98923393.jpg",
           "originalName": "modded-truck.jpg",
           "size": 66042
         }
       ],
-      "dateAdded": "2025-06-19T23:53:33.931Z",
-      "lastModified": "2025-06-19T23:54:50.741Z",
-      "isActive": true
-    },
-    {
-      "id": "2000-test-truck-1750380763911",
-      "year": 2000,
-      "make": "test",
-      "model": "truck",
-      "condition": "New",
-      "price": null,
-      "isAvailable": true,
-      "isFeatured": false,
-      "images": [],
-      "dateAdded": "2025-06-20T00:52:43.911Z",
-      "lastModified": "2025-06-20T00:52:43.911Z",
-      "isActive": true
-    },
-    {
-      "id": "2020-test-truck-1750386049717",
-      "year": 2020,
-      "make": "test",
-      "model": "truck",
-      "condition": "New",
-      "price": null,
-      "overview": "making sure this dind't break",
-      "isAvailable": false,
-      "isFeatured": false,
-      "images": [],
-      "dateAdded": "2025-06-20T02:20:49.717Z",
-      "lastModified": "2025-06-20T02:20:49.717Z",
+      "dateAdded": "2025-06-20T21:31:59.568Z",
+      "lastModified": "2025-06-20T21:31:59.610Z",
       "isActive": true
     }
   ],
   "siteSettings": {
     "announcement": {
       "isActive": true,
-      "title": "Good morning!",
-      "message": "This is a test",
-      "createdAt": "2025-06-20T17:33:59.504Z"
+      "title": "New banner check it out",
+      "message": "Look at this annoucnment its a big deal for me. ",
+      "createdAt": "2025-06-20T22:42:16.567Z"
     },
     "banner": {
-      "imageUrl": "/uploads/general/truck-image-1750440839577-641553472.jpg",
+      "imageUrl": "/uploads/general/truck-image-1750459258398-669130466.jpg",
       "altText": "BHB Truck Sales"
     },
     "logo": {
-      "imageUrl": "",
+      "imageUrl": "/uploads/general/truck-image-1750459336925-898085833.jpg",
       "altText": "BHB Truck Sales Logo"
     }
   },
@@ -192,8 +207,13 @@
       {
         "type": "paragraph",
         "text": "Our team is dedicated to helping you find the perfect truck for your business needs. We're here to help."
+      },
+      {
+        "type": "image",
+        "url": "/uploads/general/truck-image-1750459778446-372491784.jpg",
+        "caption": "absolute mac"
       }
     ]
   },
-  "lastUpdated": "2025-06-20T17:33:59.611Z"
+  "lastUpdated": "2025-06-20T22:49:38.480Z"
 }
